@@ -2,16 +2,18 @@ from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.app import ObjectProperty, StringProperty
 
-from plyer import gps, call, sms
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.clock import mainthread
 from kivy.utils import platform
 
+__version__ = '0.8.7'
+
 
 if platform == 'android':
     from android import AndroidService
     from android.permissions import request_permissions, Permission
+    from plyer import gps, call, sms
 
 
 # Declare both screens
@@ -37,6 +39,7 @@ class MyApp(App):
             Permission.CALL_PHONE,
             Permission.SEND_SMS,
             Permission.FOREGROUND_SERVICE,
+            Permission.CALL_PRIVILEGED,
         ]
 
         request_permissions(required_permissions)
@@ -44,30 +47,22 @@ class MyApp(App):
     def build(self):
         try:
             gps.configure(on_location=self.on_location)
-
         except NotImplementedError:
             print('GPS is not implemented for your platform')
-
         if platform == "android":
             print("gps.py: Android detected. Requesting permissions")
             self.request_android_permissions()
             print("gps.py: Premissions requested")
 
     def start(self, minTime, minDistance):
-        print("Before start gps")
         gps.start(minTime, minDistance)
-        print("After start gps")
 
     def stop(self):
-        print("Before stop gps")
         gps.stop()
-        print("After stop gps")
 
     @mainthread
     def on_location(self, **kwargs):
-        print("on_location start")
-        self.gps_location = {'lat': kwargs['lat'], 'lon': kwargs['lon']}  #' '.join(['{}={}'.format(k, v) for k, v in kwargs.items()])
-        print("on_location end")
+        self.gps_location = {'lat': kwargs['lat'], 'lon': kwargs['lon']}
 
     def sos_signal_activate(self):
         print(f'\r\n SOS ACTIVATED\nnumber: {self.number}; sms: {self.sms}; call: {self.call}; gps: {self.gps_location}\r\n')
@@ -76,17 +71,22 @@ class MyApp(App):
         # call.makecall(tel=self.number)
         # print('CALL MADE')
 
-        self.service = AndroidService('Sevice example', 'service is running')
-        self.service.start('Hello From Service')
+
+        self.service = AndroidService("Started service")#MyService("Started service")
+
+        newline = '\r\n'
+        divider = ' ; ----------------->  | '
+
+        # activity = autoclass('org.kivy.android.PythonActivity').mActivity
+        # service = autoclass('org.kivy.android.PythonService')  # 'org.test.sos.test.Servicemyservice')
+        import random
+        # print(f'Activity: {f"{newline}".join([property for property in dir(activity)])}')
+        props = [prop for prop in dir(self.service)]
+        print(f'service: {newline.join(props)}')
+
+        self.service.start("started service")
 
 
-
-        self.service.stopForeground(True)
-
-
-        # service = autoclass('org.test.sos.test.ServiceMyservice')
-        # mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
-        # service.start(mActivity, "")
 
 
     def save_and_return_to_main_menu(self, number, sms, call):
@@ -100,4 +100,12 @@ class MyApp(App):
 
 
 if __name__ == '__main__':
+    import re
+
+    version_splitted = __version__.split('.')
+    version_splitted[1] = f'{int(version_splitted[1]) + 1}'
+
+    __version__ = '.'.join(version_splitted)
+
     MyApp().run()
+

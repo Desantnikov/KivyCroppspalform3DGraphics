@@ -8,6 +8,7 @@ cython = "==0.29.19"
 kivy = {extras = ["all"], version = "*"}
 plyer = "*"
 setuptools = "*"
+oscpy = "*"
 
 [dev-packages]
 

@@ -11,13 +11,17 @@ run_adb:
 	@export PATH=$PATH:/home/admin1/.buildozer/android/platform/android-sdk/platform-tools/adb
 	@adb logcat
 
-run_adb_grep_python:
+run_adb_filtered:
 	@echo "Connecting to device via USB"
 	@export PATH=$PATH:/home/admin1/.buildozer/android/platform/android-sdk/platform-tools/adb
-	@adb logcat | grep python
+	@adb logcat | grep -E "python|myservice"
 
 run:
-	@rm -rf ./bin/*
-	@awk '{version = 0.6.}{sub(/[[:digit:]]+$/,$NF+1)}1' buildozer.spec
+	# @rm -rf ./bin/*
 	@make build_and_deploy
-	@make run_adb_grep_python
+	@make run_adb_filtered
+
+run_full_logs:
+	@rm -rf ./bin/*
+	@make build_and_deploy
+	@make run_adb

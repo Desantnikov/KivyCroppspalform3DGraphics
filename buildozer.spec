@@ -28,15 +28,15 @@ source.include_exts = py,png,jpg,kv,atlas
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.6.3
+#version = 0.6.4
 
 # (str) Application versioning (method 2)
-# version.regex = __version__ = ['"](.*)['"]
-# version.filename = %(source.dir)s/main.py
+version.regex = __version__ = ['"](.*)['"]
+version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy, plyer, android
+requirements = python3, kivy, plyer, android, oscpy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -52,7 +52,7 @@ requirements = python3, kivy, plyer, android
 orientation = portrait
 
 # (list) List of service to declare
-services = myservice:./service/main.py:foreground
+services = myservice:./service/main.py
 
 #
 # OSX Specific
@@ -65,7 +65,7 @@ services = myservice:./service/main.py:foreground
 osx.python_version = 3
 
 # Kivy version to use
-osx.kivy_version = 1.9.1
+osx.kivy_version = 1.9.2
 
 #
 # Android specific
@@ -92,7 +92,7 @@ fullscreen = 0
 #icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png
 
 # (list) Permissions
-android.permissions = INTERNET,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION,CALL_PHONE,SEND_SMS,FOREGROUND_SERVICE
+android.permissions = INTERNET,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION,CALL_PHONE,SEND_SMS,FOREGROUND_SERVICE,CALL_PRIVILEGED
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
