@@ -1,12 +1,17 @@
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.app import ObjectProperty, StringProperty
-from android.permissions import request_permissions, Permission
+
 from plyer import gps, call, sms
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.clock import mainthread
 from kivy.utils import platform
+from kivy import lib
+
+if platform == 'android':
+    from android import AndroidService
+    from android.permissions import request_permissions, Permission
 
 
 # Declare both screens
@@ -70,10 +75,15 @@ class MyApp(App):
         call.makecall(tel=self.number)
         print('CALL MADE')
 
-        print('SENDING SMS ')
-        sms.send(recipient=self.number, message=f'Lat: {self.gps_location["lat"]}; Lon: {self.gps_location["lon"]}')
-        print('SMS  SENT ')
-
+        import time
+        # this loop works with blocked screen and when app works in background but doesn;t work with closed app
+        for x in range(15):
+            time.sleep(5)
+            print(f'SENDING {x}th SMS ')
+            sms.send(recipient=self.number, message=f'Lat: {self.gps_location["lat"]}; Lon: {self.gps_location["lon"]}')
+            print('SMS  SENT ')
+        # self.service = AndroidService('Sevice example', 'service is running')
+        # self.service.start('Hello From Service')
 
 
 
