@@ -2,7 +2,7 @@
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.app import ObjectProperty
 from android.permissions import request_permissions, Permission
-from plyer import gps, call
+from plyer import gps, call, sms
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.clock import mainthread
@@ -25,7 +25,7 @@ class MyApp(App):
     call = None
 
     def request_android_permissions(self):
-        request_permissions([Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION, Permission.CALL_PHONE])
+        request_permissions([Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION, Permission.CALL_PHONE, Permission.SEND_SMS])
 
     def build(self):
         try:
@@ -60,6 +60,7 @@ class MyApp(App):
         # self.root.children[0].add_widget(Button(text=f'LOCATION: {self.gps_location}'))
         # call.makecall(tel=self.number)
         call.makecall(tel=int(self.number))
+        sms.send(recipient=self.number, message='Message avakov chort')
 
     def save_and_return_to_main_menu(self, number, sms, call):
         self.number = number
