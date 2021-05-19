@@ -7,7 +7,7 @@ from kivy.app import App
 from kivy.uix.button import Button
 from kivy.clock import mainthread
 from kivy.utils import platform
-from kivy import lib
+
 
 if platform == 'android':
     from android import AndroidService
@@ -30,15 +30,16 @@ class MyApp(App):
     sms = None
     call = None
 
-    def __init__(self):
-        super(MyApp, self).__init__()
-        Window.bind(on_keyboard=self.test_keyboard)
-
-    def test_keyboard(self, window, key, *args):
-        print(f'TEST_KEYBOARD\r\nKey: {key}; Args: {args}')
-
     def request_android_permissions(self):
-        request_permissions([Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION, Permission.CALL_PHONE, Permission.SEND_SMS])
+        required_permissions = [
+            Permission.ACCESS_COARSE_LOCATION,
+            Permission.ACCESS_FINE_LOCATION,
+            Permission.CALL_PHONE,
+            Permission.SEND_SMS,
+            Permission.FOREGROUND_SERVICE,
+        ]
+
+        request_permissions(required_permissions)
 
     def build(self):
         try:
@@ -71,20 +72,21 @@ class MyApp(App):
     def sos_signal_activate(self):
         print(f'\r\n SOS ACTIVATED\nnumber: {self.number}; sms: {self.sms}; call: {self.call}; gps: {self.gps_location}\r\n')
 
-        print('MAKING A CALL')
-        call.makecall(tel=self.number)
-        print('CALL MADE')
+        # print('MAKING A CALL')
+        # call.makecall(tel=self.number)
+        # print('CALL MADE')
 
-        import time
-        # this loop works with blocked screen and when app works in background but doesn;t work with closed app
-        for x in range(15):
-            time.sleep(5)
-            print(f'SENDING {x}th SMS ')
-            sms.send(recipient=self.number, message=f'Lat: {self.gps_location["lat"]}; Lon: {self.gps_location["lon"]}')
-            print('SMS  SENT ')
-        # self.service = AndroidService('Sevice example', 'service is running')
-        # self.service.start('Hello From Service')
+        self.service = AndroidService('Sevice example', 'service is running')
+        self.service.start('Hello From Service')
 
+
+
+        self.service.stopForeground(True)
+
+
+        # service = autoclass('org.test.sos.test.ServiceMyservice')
+        # mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
+        # service.start(mActivity, "")
 
 
     def save_and_return_to_main_menu(self, number, sms, call):
