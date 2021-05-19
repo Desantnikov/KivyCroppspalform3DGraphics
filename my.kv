@@ -1,35 +1,64 @@
+#: kivy 1.10.0
+
+ScreenManager:
+    id: screen_manager
+
+    MenuScreen:
+        id: menu_screen
+        name: 'menu'
+        manager: 'screen_manager'
+
+    SettingsScreen:
+        id: settings_screen
+        name: 'settings'
+        manager: 'screen_manager'
 
 
-<Container>:
-    rows: 3
-    padding: 50
+<MenuScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        spacing: 50
 
-    text_input: text_input
-    button: button
-    label: label
-
-    TextInput:
-        id: text_input
-
-        size_hint: 1, 0.4
-        multiline: False
-        font_size: 40
-
-    Label:
-        id: label
-        text: 'Label1'
-        font_size: 40
-
-    FloatLayout:
         Button:
-            id: button
+            text: 'Settings'
+            on_press: app.root.current = 'settings'
 
-            size_hint: 0.5, 0.4
-            pos_hint: {'center_x': 0.5, 'y': 0.1}
-            text: 'Btn1'
-            font_size: 40
-
-            on_release: root.change_test()
+        Button:
+            text: 'SOS'
+            on_press: app.sos_signal_activate()
 
 
+<SettingsScreen>:
+    GridLayout:
+        rows: 5
+        padding: 50
+        spacing: 50
 
+        number_text_input: number_text_input
+        geo_with_sms_enable_btn: geo_with_sms_enable_btn
+        call_enable_btn: call_enable_btn
+
+        TextInput:
+            id: number_text_input
+            text: 'Enter emergency number here'
+
+        Label:
+            text: 'Send geo with SMS'
+
+        Button:
+            id: geo_with_sms_enable_btn
+            text: '-'
+            on_press: self.text = '+' if self.text == '-' else '-'
+
+        Label:
+            text: 'Call'
+
+        Button:
+            id: call_enable_btn
+            text: '-'
+            on_press: self.text = '+' if self.text == '-' else '-'
+
+        Button:
+            text: 'Save and return to main menu'
+            on_press: app.save_and_return_to_main_menu(self.parent.number_text_input.text, self.parent.geo_with_sms_enable_btn.text, self.parent.call_enable_btn.text)
