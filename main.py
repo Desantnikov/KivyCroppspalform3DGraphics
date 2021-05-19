@@ -25,7 +25,7 @@ class MyApp(App):
     call = None
 
     def request_android_permissions(self):
-        request_permissions([Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION])
+        request_permissions([Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION, Permission.CALL_PHONE])
 
     def build(self):
         try:
