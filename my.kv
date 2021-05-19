@@ -1,0 +1,35 @@
+
+
+<Container>:
+    rows: 3
+    padding: 50
+
+    text_input: text_input
+    button: button
+    label: label
+
+    TextInput:
+        id: text_input
+
+        size_hint: 1, 0.4
+        multiline: False
+        font_size: 40
+
+    Label:
+        id: label
+        text: 'Label1'
+        font_size: 40
+
+    FloatLayout:
+        Button:
+            id: button
+
+            size_hint: 0.5, 0.4
+            pos_hint: {'center_x': 0.5, 'y': 0.1}
+            text: 'Btn1'
+            font_size: 40
+
+            on_release: root.change_test()
+
+
+
