@@ -12,5 +12,6 @@ run_adb_grep_python:
 	@adb logcat | grep python
 
 run:
+	@rm -rf ./bin/*
 	@make build_and_deploy
 	@make run_adb_grep_python

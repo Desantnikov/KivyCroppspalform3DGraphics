@@ -2,6 +2,10 @@
 
 ScreenManager:
     id: screen_manager
+    number: settings_screen.tel
+    geo_with_sms_enable_btn: settings_screen.geo_with_sms_enable_btn
+    call_enable_btn: settings_screen.call_enable_btn
+
 
     MenuScreen:
         id: menu_screen
@@ -36,18 +40,20 @@ ScreenManager:
 
 
 <SettingsScreen>:
+    tel: number_text_input
+    geo_with_sms_enable_btn: geo_with_sms_enable_btn
+    call_enable_btn: call_enable_btn
+
     GridLayout:
         rows: 5
         padding: 50
         spacing: 50
 
-        number_text_input: number_text_input
-        geo_with_sms_enable_btn: geo_with_sms_enable_btn
-        call_enable_btn: call_enable_btn
+
 
         TextInput:
             id: number_text_input
-            text: 'Enter emergency number here'
+            text: '0666127932'
 
         Label:
             text: 'Send geo with SMS'
@@ -67,4 +73,4 @@ ScreenManager:
 
         Button:
             text: 'Save and return to main menu'
-            on_press: app.save_and_return_to_main_menu(self.parent.number_text_input.text, self.parent.geo_with_sms_enable_btn.text, self.parent.call_enable_btn.text)
+            on_press: app.save_and_return_to_main_menu(self.parent.number.text, self.parent.geo_with_sms_enable_btn.text, self.parent.call_enable_btn.text)

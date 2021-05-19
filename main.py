@@ -1,6 +1,6 @@
-
+from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.app import ObjectProperty
+from kivy.app import ObjectProperty, StringProperty
 from android.permissions import request_permissions, Permission
 from plyer import gps, call, sms
 from kivy.app import App
@@ -20,9 +20,17 @@ class SettingsScreen(Screen):
 
 
 class MyApp(App):
-    number = None
+    number = StringProperty(defaultvalue='+380666127932')  # number should be '+38066...s' or '066...'
+    gps_location = None
     sms = None
     call = None
+
+    def __init__(self):
+        super(MyApp, self).__init__()
+        Window.bind(on_keyboard=self.test_keyboard)
+
+    def test_keyboard(self, window, key, *args):
+        print(f'TEST_KEYBOARD\r\nKey: {key}; Args: {args}')
 
     def request_android_permissions(self):
         request_permissions([Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION, Permission.CALL_PHONE, Permission.SEND_SMS])
@@ -52,15 +60,22 @@ class MyApp(App):
     @mainthread
     def on_location(self, **kwargs):
         print("on_location start")
-        self.gps_location = '\n'.join(['{}={}'.format(k, v) for k, v in kwargs.items()])
+        self.gps_location = {'lat': kwargs['lat'], 'lon': kwargs['lon']}  #' '.join(['{}={}'.format(k, v) for k, v in kwargs.items()])
         print("on_location end")
 
     def sos_signal_activate(self):
-        print(f'\r\n SOS ACTIVATED\nnumber: {self.number}; sms: {self.sms}; call: {self.call}\r\n')
-        # self.root.children[0].add_widget(Button(text=f'LOCATION: {self.gps_location}'))
-        # call.makecall(tel=self.number)
-        call.makecall(tel=int(self.number))
-        sms.send(recipient=self.number, message='Message avakov chort')
+        print(f'\r\n SOS ACTIVATED\nnumber: {self.number}; sms: {self.sms}; call: {self.call}; gps: {self.gps_location}\r\n')
+
+        print('MAKING A CALL')
+        call.makecall(tel=self.number)
+        print('CALL MADE')
+
+        print('SENDING SMS ')
+        sms.send(recipient=self.number, message=f'Lat: {self.gps_location["lat"]}; Lon: {self.gps_location["lon"]}')
+        print('SMS  SENT ')
+
+
+
 
     def save_and_return_to_main_menu(self, number, sms, call):
         self.number = number
