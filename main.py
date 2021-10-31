@@ -71,7 +71,7 @@ class Cube:
 
         self.sides[CUBE_SIDES.BACK] = self._calc_back_side()
 
-        self.half_edge_length =
+        # self.half_edge_length =
 
         self.sides[CUBE_SIDES.TOP] = self._calc_top_side()
         self.sides[CUBE_SIDES.RIGHT] = self._calc_right_side()
@@ -84,7 +84,7 @@ class Cube:
                     transform_x=self.half_edge_length,
                     transform_y=self.half_edge_length,
                 )
-                for corner in front_side.corners
+                for corner in self.sides[CUBE_SIDES.FRONT].corners
             ),
         )
 
@@ -92,7 +92,7 @@ class Cube:
 
     def _calc_top_side(self):
         front_top_edge = self.sides[CUBE_SIDES.FRONT].corners[1], self.sides[CUBE_SIDES.FRONT].corners[2]
-        back_top_edge = self.sides[CUBE_SIDES.BACK].corners[1], self.sides[CUBE_SIDES.BACK].corners[2]
+        back_top_edge = self.sides[CUBE_SIDES.BACK].corners[2], self.sides[CUBE_SIDES.BACK].corners[1]
 
         top_side = CubeSide(
             side=CUBE_SIDES.TOP,
@@ -103,7 +103,7 @@ class Cube:
 
     def _calc_right_side(self):
         front_right_edge = self.sides[CUBE_SIDES.FRONT].corners[2], self.sides[CUBE_SIDES.FRONT].corners[3]
-        back_right_edge = self.sides[CUBE_SIDES.BACK].corners[2], self.sides[CUBE_SIDES.BACK].corners[3]
+        back_right_edge = self.sides[CUBE_SIDES.BACK].corners[3], self.sides[CUBE_SIDES.BACK].corners[2]
 
         right_side = CubeSide(
             side=CUBE_SIDES.RIGHT,
@@ -148,12 +148,12 @@ class MyWidget(Widget):
             cube.sides[CUBE_SIDES.BACK].draw()
             Color(0, 255, 0)
             #
-            # cube.sides[CUBE_SIDES.BACK].draw()
-            # Color(255, 0, 0)
+            cube.sides[CUBE_SIDES.RIGHT].draw()
+            Color(255, 0, 0)
 
             cube.sides[CUBE_SIDES.FRONT].draw()
 
-            Color(0,255,0)
+            Color(0, 0,255)
             cube.sides[CUBE_SIDES.TOP].draw()
 
 
