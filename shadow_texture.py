@@ -14,7 +14,7 @@ def make_texture(width=600):
             draw.line([start, end],  (1, 1, 1, int(x * y)), width=1)
 
     from PIL.Image import BILINEAR, BOX, BICUBIC
-    gradient = gradient.rotate(angle=35, resample=BICUBIC,expand=True, translate=(95, 1))
+    gradient = gradient.rotate(angle=41, resample=BICUBIC,expand=True, translate=(95, 50))
     # gradient = gradient.effect_spread(distance=10)
 
     # for line in range(width):
