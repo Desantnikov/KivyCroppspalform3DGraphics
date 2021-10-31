@@ -17,10 +17,9 @@ from kivy.uix.button import Button
 from enum import Enum, IntEnum
 from dataclasses import dataclass
 
-from typing import List
+from typing import List, Union, Dict, Tuple
 
 
-from kivy.graphics import UpdateNormalMatrix
 
 class CUBE_SIDES(IntEnum):
     FRONT = 0
@@ -33,88 +32,129 @@ class CUBE_SIDES(IntEnum):
 
 @dataclass
 class Pos:
-    x: int
-    y: int
+    x: Union[int, float]
+    y: Union[int, float]
 
-from kivy.graphics.opengl import glViewport
-import time
+    def get_transformed_pos(self, transform_x, transform_y):
+        x = self.x + transform_x
+        y = self.y + transform_y
+        return Pos(x, y)
+
+    def coords(self, coeffitient=10):
+        return self.x * coeffitient, self.y * coeffitient
 
 @dataclass
 class CubeSide:
     side: CUBE_SIDES
-    corners: List[Pos]
+    corners: Tuple[Pos, ...]
+
+    def get_edge_length(self):
+        return self.corners[1].y - self.corners[0].y
+
+    def get_coords(self):
+        coords = []
+        for corner in self.corners:
+            coords.extend(corner.coords())
+
+        return coords
+
+    def draw(self):
+        Quad(points=self.get_coords())
+
+class Cube:
+    def __init__(self, front_side):
+        self.sides = {
+            CUBE_SIDES.FRONT: front_side,
+        }
+
+        self.half_edge_length = self.sides[CUBE_SIDES.FRONT].get_edge_length() / 2
+
+        self.sides[CUBE_SIDES.BACK] = self._calc_back_side()
+
+        self.half_edge_length =
+
+        self.sides[CUBE_SIDES.TOP] = self._calc_top_side()
+        self.sides[CUBE_SIDES.RIGHT] = self._calc_right_side()
+
+    def _calc_back_side(self) -> CubeSide:
+        back_side = CubeSide(
+            side=CUBE_SIDES.BACK,
+            corners=tuple(
+                corner.get_transformed_pos(
+                    transform_x=self.half_edge_length,
+                    transform_y=self.half_edge_length,
+                )
+                for corner in front_side.corners
+            ),
+        )
+
+        return back_side
+
+    def _calc_top_side(self):
+        front_top_edge = self.sides[CUBE_SIDES.FRONT].corners[1], self.sides[CUBE_SIDES.FRONT].corners[2]
+        back_top_edge = self.sides[CUBE_SIDES.BACK].corners[1], self.sides[CUBE_SIDES.BACK].corners[2]
+
+        top_side = CubeSide(
+            side=CUBE_SIDES.TOP,
+            corners=front_top_edge + back_top_edge,
+        )
+
+        return top_side
+
+    def _calc_right_side(self):
+        front_right_edge = self.sides[CUBE_SIDES.FRONT].corners[2], self.sides[CUBE_SIDES.FRONT].corners[3]
+        back_right_edge = self.sides[CUBE_SIDES.BACK].corners[2], self.sides[CUBE_SIDES.BACK].corners[3]
+
+        right_side = CubeSide(
+            side=CUBE_SIDES.RIGHT,
+            corners=front_right_edge + back_right_edge,
+        )
+
+        return right_side
+
+
+front_bottom_left = Pos(10, 10)
+front_top_left = Pos(10, 20)
+front_top_right = Pos(20, 20)
+front_bottom_right = Pos(20, 10)
+
+front_side = CubeSide(
+    side=CUBE_SIDES.FRONT,
+    corners=(
+        front_bottom_left,
+        front_top_left,
+        front_top_right,
+        front_bottom_right,
+    ),
+)
+
+cube = Cube(front_side=front_side)
+
+
+
+
+
+
+
+
 
 
 class MyWidget(Widget):
     def __init__(self, **kwargs):
-        # self.canvas = RenderContext()#use_parent_modelview=True)
         self.rect = None
         super(MyWidget, self).__init__(**kwargs)
-        # self.canvas = RenderContext(use_parent_projection=True)
-
-    def first(self, *args):
-        with self.canvas:
-            if not self.rect:
-                self.rect = Rectangle(pos=(50,50), size=(250, 250))
-
-            else:
-                self.rect.pos = (250,250)
-
-        print('Rect done')
-
-    def second(self, *args):
-        # self.qwe()
-
-        # self.render_context['modelview_mat'] = projection_mat
-        # with self.render_context:
-
-        # glViewport(0, 0, 800, 600)
-
-        # self.canvas['modelview_mat'] = Matrix().scale(1.5,1,1)
-        # self.canvas['modelview_mat'] = Matrix().rotate(45, 60,60,1)
-        # self.parent.canvas['projection_mat'] = Matrix().scale(1,2,1)
-        # with self.parent.canvas:
-        #     Matrix()
-        #     Scale(1, 2, 1)
-
 
         with self.canvas:
-            # Matrix()
-            # Scale(0.5,2,1)
-            Rotate(45, 20, 20, 1)
+            cube.sides[CUBE_SIDES.BACK].draw()
+            Color(0, 255, 0)
+            #
+            # cube.sides[CUBE_SIDES.BACK].draw()
+            # Color(255, 0, 0)
 
-        # mtr = PushMatrix(projection_mat)
+            cube.sides[CUBE_SIDES.FRONT].draw()
 
-        self.canvas.ask_update()
-        # self.parent.canvas.ask_update()
-
-        print('Second done')
-        return
-        # with self.canvas:
-        # # self.add_widget()
-        #     Rectangle(size=(150, 50), pos=(25, 25))
-        # return
-
-        from math import radians
-        w, h = 800, 600
-        w2, h2 = w / 2., h / 2.
-        r = radians(45)
-
-        projection_mat = Matrix()
-        projection_mat.view_clip(0.0, w, 0.0, h, -1.0, 1.0, 0)
-        # self.render_context['projection_mat'] = projection_mat
-
-        # do modelview matrix
-        modelview_mat = Matrix().translate(w2, h2, 0)
-        modelview_mat = modelview_mat.multiply(Matrix().rotate(r, 0, 0, 1))
-
-        w, h = self.size
-        w2, h2 = w / 2., h / 2.
-        modelview_mat = modelview_mat.multiply(Matrix().translate(-w2, -h2, 0))
-        modelview_mat = Matrix().scale(1,2,1)
-        # self.render_context['modelview_mat'] = projection_mat
-
-
+            Color(0,255,0)
+            cube.sides[CUBE_SIDES.TOP].draw()
 
 
 class RootWidgetBoxLayout(FloatLayout):
@@ -122,27 +162,12 @@ class RootWidgetBoxLayout(FloatLayout):
         super(RootWidgetBoxLayout, self).__init__(**kwargs)
 
         my_widget = MyWidget()
-        self.add_widget(my_widget, canvas='before')
-
-        btn1 = Button(text="asdqwdqwdq", pos_hint={'top':0.25, 'right': 0.25}, size_hint=(0.25, 0.25))
-        btn1.bind(on_press=my_widget.first)
-
-        btn2 = Button(text="Second", pos_hint={'top': 0.25, 'right': 0.5}, size_hint=(0.25, 0.25))
-        btn2.bind(on_press=my_widget.second)
-
-        self.add_widget(btn1)
-        self.add_widget(btn2)
-
+        self.add_widget(my_widget)
 
 
 class MyApp(App):
     def build(self):
         self.root = root = RootWidgetBoxLayout()
-        # self.root.add_widget(Button(text="asdasdas"))
-        # self.root.add_widget(Button(text="asdasdas"))
-        # with root.canvas.before:
-        #     Color(0, 1, 0, 1)  # green; colors range from 0-1 not 0-255
-        #     self.rect = Rectangle(size=root.size, pos=root.pos)
 
         return root
 
