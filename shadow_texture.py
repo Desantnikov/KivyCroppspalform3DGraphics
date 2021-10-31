@@ -11,10 +11,12 @@ def make_texture(width=600):
         for y in range(width):
             start = (x, y)
             end = (y, x)
-            draw.line([start, end],  (1, 1, 1, int(x)), width=1)
+            draw.line([start, end],  (1, 1, 1, int(x * y)), width=1)
 
-    from PIL.Image import BILINEAR
-    gradient = gradient.rotate(angle=35, resample=BILINEAR,expand=True)
+    from PIL.Image import BILINEAR, BOX, BICUBIC
+    gradient = gradient.rotate(angle=35, resample=BICUBIC,expand=True, translate=(95, 1))
+    # gradient = gradient.effect_spread(distance=10)
+
     # for line in range(width):
     #     draw.line([(line, line), (width, width)], (1,1,1,line), width=1)
     buf = bytes(gradient.tobytes())
@@ -22,5 +24,6 @@ def make_texture(width=600):
     texture = Texture.create(size=(width, width+200), bufferfmt='ubyte', callback=print)
     texture.wrap = 'clamp_to_edge'
     texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
+
     # gradient.show()
     return texture
