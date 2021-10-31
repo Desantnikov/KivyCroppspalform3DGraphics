@@ -42,11 +42,11 @@ class MyWidget(Widget):
         ]
 
         texture = make_texture()
-
+        from calculations.cube import SIDE
         with self.canvas:
             for cube in reversed(cubes_lines):
                 for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
-                    cube.sides[side].draw(texture=texture)
+                    cube.sides[side].draw(texture=texture if side == SIDE.FRONT else None)
                     Color(*self.cube_sides_color_values[idx])
 
 

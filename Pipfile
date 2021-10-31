@@ -10,6 +10,7 @@ plyer = "*"
 setuptools = "*"
 "kivy.deps.gstreamer" = "*"
 kivy-examples = "*"
+pillow = "*"
 
 [dev-packages]
 
