@@ -4,9 +4,10 @@ from kivy.app import ObjectProperty, StringProperty
 from plyer import gps, call, sms
 from kivy.app import App, Widget
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics.texture import Texture
 from kivy.graphics import Line, Rectangle, Quad, Color, Point, Translate, RenderContext, ApplyContextMatrix
-from kivy.graphics import PushMatrix, PopMatrix, UpdateNormalMatrix, Rotate, Scale
+from kivy.graphics import *
 from kivy.graphics.transformation import Matrix
 from kivy.clock import mainthread
 from kivy.utils import platform
@@ -47,13 +48,17 @@ class CubeSide:
 class MyWidget(Widget):
     def __init__(self, **kwargs):
         # self.canvas = RenderContext()#use_parent_modelview=True)
-
+        self.rect = None
         super(MyWidget, self).__init__(**kwargs)
-        self.canvas = RenderContext(use_parent_projection=True)
+        # self.canvas = RenderContext(use_parent_projection=True)
 
     def first(self, *args):
         with self.canvas:
-            self.rect = Rectangle(pos=(0,0), size=(250, 250))
+            if not self.rect:
+                self.rect = Rectangle(pos=(50,50), size=(250, 250))
+
+            else:
+                self.rect.pos = (250,250)
 
         print('Rect done')
 
@@ -65,14 +70,23 @@ class MyWidget(Widget):
 
         # glViewport(0, 0, 800, 600)
 
-        self.canvas['modelview_mat'] = Matrix().scale(1.5,1,1)
-        # self.canvas['projection_mat'] = Matrix().scale(1,2,1)
+        # self.canvas['modelview_mat'] = Matrix().scale(1.5,1,1)
+        # self.canvas['modelview_mat'] = Matrix().rotate(45, 60,60,1)
+        # self.parent.canvas['projection_mat'] = Matrix().scale(1,2,1)
+        # with self.parent.canvas:
+        #     Matrix()
+        #     Scale(1, 2, 1)
 
-            # Scale(1, 1, 2)
+
+        with self.canvas:
+            # Matrix()
+            # Scale(0.5,2,1)
+            Rotate(45, 20, 20, 1)
 
         # mtr = PushMatrix(projection_mat)
 
         self.canvas.ask_update()
+        # self.parent.canvas.ask_update()
 
         print('Second done')
         return
@@ -103,17 +117,17 @@ class MyWidget(Widget):
 
 
 
-class RootWidgetBoxLayout(BoxLayout):
+class RootWidgetBoxLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(RootWidgetBoxLayout, self).__init__(**kwargs)
+
         my_widget = MyWidget()
+        self.add_widget(my_widget, canvas='before')
 
-        self.add_widget(my_widget)
-
-        btn1 = Button(text="asdqwdqwdq", size_hint=(0.3, 0.5))
+        btn1 = Button(text="asdqwdqwdq", pos_hint={'top':0.25, 'right': 0.25}, size_hint=(0.25, 0.25))
         btn1.bind(on_press=my_widget.first)
 
-        btn2 = Button(text="Second", size_hint=(0.3, 0.5))
+        btn2 = Button(text="Second", pos_hint={'top': 0.25, 'right': 0.5}, size_hint=(0.25, 0.25))
         btn2.bind(on_press=my_widget.second)
 
         self.add_widget(btn1)
