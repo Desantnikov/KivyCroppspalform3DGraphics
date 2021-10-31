@@ -34,7 +34,6 @@ for line_number in range(1, 11):
     cubes_lines.extend(cubes_line)
 
 
-
 class MyWidget(Widget):
     def __init__(self, **kwargs):
         self.rect = None
@@ -45,15 +44,20 @@ class MyWidget(Widget):
             (1, 1, 1),
             (0.3, 0.3, 0.3),
         ]
-
-
-
+        self.sides = []
         with self.canvas:
             for cube in reversed(cubes_lines):
                 for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
-                    cube.sides[side].draw()
+                    self.sides.append(cube.sides[side].draw())
                     Color(rgb=self.cube_sides_color_values[idx])
 
+        from kivy.animation import Animation
+        texture = make_texture()
+
+        points = [1 - 3 * point for point in self.sides[-1].points]
+
+        anim = Animation(points=points, duration=10)
+        anim.start(self.sides[-1])
 
 class RootWidgetBoxLayout(FloatLayout):
     def __init__(self, **kwargs):
