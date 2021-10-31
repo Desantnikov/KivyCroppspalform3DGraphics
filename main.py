@@ -19,7 +19,7 @@ def front_side_gen(bottom_left_corner: Pos, size: int):
 
 cubes_lines = []
 
-for line_number in range(10):
+for line_number in range(1, 11):
     cubes_line = [
         Cube(**front_side_gen(bottom_left_corner=Pos((idx * 7) + line_number * 7, line_number * 7), size=10))# - idx / 2))
         for idx
@@ -35,10 +35,12 @@ class MyWidget(Widget):
         super(MyWidget, self).__init__(**kwargs)
 
         self.cube_sides_color_values = [
-            (255, 0, 0),
-            (0, 255, 0),
-            (0, 0, 255),
-            (122, 122, 0),
+             # right
+              # front
+            (0.6, 0.6, 0.6),  # top
+
+            (1, 1, 1),# (120, 120, 120),
+            (0.3, 0.3, 0.3),
         ]
 
         texture = make_texture()
@@ -46,8 +48,8 @@ class MyWidget(Widget):
         with self.canvas:
             for cube in reversed(cubes_lines):
                 for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
-                    cube.sides[side].draw(texture=texture if side == SIDE.FRONT else None)
-                    Color(*self.cube_sides_color_values[idx])
+                    cube.sides[side].draw()#texture=texture if side == SIDE.FRONT else None)
+                    Color(rgb=self.cube_sides_color_values[idx])
 
 
 class RootWidgetBoxLayout(FloatLayout):
