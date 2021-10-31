@@ -2,75 +2,8 @@
 
 ScreenManager:
     id: screen_manager
-    number: settings_screen.tel
-    geo_with_sms_enable_btn: settings_screen.geo_with_sms_enable_btn
-    call_enable_btn: settings_screen.call_enable_btn
-
 
     MenuScreen:
         id: menu_screen
         name: 'menu'
         manager: 'screen_manager'
-
-    SettingsScreen:
-        id: settings_screen
-        name: 'settings'
-        manager: 'screen_manager'
-
-
-<MenuScreen>:
-    BoxLayout:
-        orientation: 'vertical'
-        padding: 50
-        spacing: 50
-
-        Button:
-            text: 'Settings'
-            on_press: app.root.current = 'settings'
-
-        Button:
-            text: 'SOS'
-            on_press: app.sos_signal_activate()
-
-        ToggleButton:
-            text: 'Start' if self.state == 'normal' else 'Stop'
-            on_state:
-                app.start(1000, 0) if self.state == 'down' else \
-                app.stop()
-
-
-<SettingsScreen>:
-    tel: number_text_input
-    geo_with_sms_enable_btn: geo_with_sms_enable_btn
-    call_enable_btn: call_enable_btn
-
-    GridLayout:
-        rows: 5
-        padding: 50
-        spacing: 50
-
-
-
-        TextInput:
-            id: number_text_input
-            text: '0666127932'
-
-        Label:
-            text: 'Send geo with SMS'
-
-        Button:
-            id: geo_with_sms_enable_btn
-            text: '-'
-            on_press: self.text = '+' if self.text == '-' else '-'
-
-        Label:
-            text: 'Call'
-
-        Button:
-            id: call_enable_btn
-            text: '-'
-            on_press: self.text = '+' if self.text == '-' else '-'
-
-        Button:
-            text: 'Save and return to main menu'
-            on_press: app.save_and_return_to_main_menu(self.parent.number.text, self.parent.geo_with_sms_enable_btn.text, self.parent.call_enable_btn.text)

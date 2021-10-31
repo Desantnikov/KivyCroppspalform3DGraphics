@@ -1,91 +1,74 @@
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.app import ObjectProperty, StringProperty
-from android.permissions import request_permissions, Permission
 from plyer import gps, call, sms
 from kivy.app import App
 from kivy.uix.button import Button
+from kivy.graphics.texture import Texture
+from kivy.graphics import Line, Rectangle, Quad, Color
 from kivy.clock import mainthread
 from kivy.utils import platform
+from kivy import kivy_examples_dir
 
-
-# Declare both screens
-class MenuScreen(Screen):
-    def menu_func(self):
-        print('\r\n MENU FUNC \r\n')
-
-
-class SettingsScreen(Screen):
+class MyApp(App):
     pass
 
 
-class MyApp(App):
-    number = StringProperty(defaultvalue='+380666127932')  # number should be '+38066...s' or '066...'
-    gps_location = None
-    sms = None
-    call = None
 
-    def __init__(self):
-        super(MyApp, self).__init__()
-        Window.bind(on_keyboard=self.test_keyboard)
+# class Square:
+#     def __init__(self, top_left, top_right, ):
 
-    def test_keyboard(self, window, key, *args):
-        print(f'TEST_KEYBOARD\r\nKey: {key}; Args: {args}')
+class MenuScreen(Screen):
+    def __init__(self, *args, **kwargs):
+        super(MenuScreen, self).__init__(*args, **kwargs)
 
-    def request_android_permissions(self):
-        request_permissions([Permission.ACCESS_COARSE_LOCATION, Permission.ACCESS_FINE_LOCATION, Permission.CALL_PHONE, Permission.SEND_SMS])
+        Window.bind(on_keyboard=self.te)
 
-    def build(self):
-        try:
-            gps.configure(on_location=self.on_location)
+    def on_enter(self, *args):
 
-        except NotImplementedError:
-            print('GPS is not implemented for your platform')
+        TEXTURE_SIZE = 255
+        texture = Texture.create(size=(TEXTURE_SIZE, TEXTURE_SIZE), bufferfmt='ubyte')
+        texture.wrap = 'clamp_to_edge'
 
-        if platform == "android":
-            print("gps.py: Android detected. Requesting permissions")
-            self.request_android_permissions()
-            print("gps.py: Premissions requested")
 
-    def start(self, minTime, minDistance):
-        print("Before start gps")
-        gps.start(minTime, minDistance)
-        print("After start gps")
-
-    def stop(self):
-        print("Before stop gps")
-        gps.stop()
-        print("After stop gps")
-
-    @mainthread
-    def on_location(self, **kwargs):
-        print("on_location start")
-        self.gps_location = {'lat': kwargs['lat'], 'lon': kwargs['lon']}  #' '.join(['{}={}'.format(k, v) for k, v in kwargs.items()])
-        print("on_location end")
-
-    def sos_signal_activate(self):
-        print(f'\r\n SOS ACTIVATED\nnumber: {self.number}; sms: {self.sms}; call: {self.call}; gps: {self.gps_location}\r\n')
-
-        print('MAKING A CALL')
-        call.makecall(tel=self.number)
-        print('CALL MADE')
-
-        print('SENDING SMS ')
-        sms.send(recipient=self.number, message=f'Lat: {self.gps_location["lat"]}; Lon: {self.gps_location["lon"]}')
-        print('SMS  SENT ')
+        import itertools
 
 
 
+        border_width = 5
 
-    def save_and_return_to_main_menu(self, number, sms, call):
-        self.number = number
-        self.sms = sms == '+'
-        self.call = call == '+'
+        buf = []
+        for y in range(TEXTURE_SIZE):
+            buf.append([])
+            # print(f'Y: {y}')
+            for x in range(TEXTURE_SIZE):
+                buf[-1].extend([255, 255, 255, y + 1]) # - gradient from up to down
 
-        self.root.current = 'menu'
 
-        print(f'\r\n SAVED:\r\nnumber: {self.number}; sms: {self.sms}; call: {self.call}\r\n')
+        for row_number, row_data in enumerate(buf[::]):
+            buf[row_number] = bytes(row_data)
 
+        # buf = [[x, y] for x, y in itertools.product(range(size), range(size))]
+
+        buf = b''.join(itertools.chain(buf))
+        # then, convert the array to a ubyte string
+        # buf = ''.join(map(chr, buf)).encode()
+
+        # then blit the buffer
+        texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
+
+        rect_size = TEXTURE_SIZE
+        with self.canvas:
+            Color(rgb=(1, 1, 1))
+            rect = Rectangle(texture=texture, pos=(150, 250), size=(rect_size, rect_size))#, size=(50,50), joint=False, close=False)
+
+    def te(self, *args, **kwargs):
+        print(f'{args}\n{kwargs}')
+        # with self.
+
+        self.canvas.add(Line(points=(50, 10, 150, 150), width=2))
+
+        # self.canvas.rect.scale(2)
 
 if __name__ == '__main__':
     MyApp().run()
