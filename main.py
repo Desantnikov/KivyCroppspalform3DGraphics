@@ -5,6 +5,7 @@ from kivy.graphics import *
 
 from calculations.cube import Cube
 from calculations.pos import Pos
+from shadow_texture import make_texture
 
 
 def front_side_gen(bottom_left_corner: Pos, size: int):
@@ -20,9 +21,9 @@ cubes_lines = []
 
 for line_number in range(10):
     cubes_line = [
-        Cube(**front_side_gen(bottom_left_corner=Pos((idx * 10) + line_number * 10, line_number * 10), size=10))# - idx / 2))
+        Cube(**front_side_gen(bottom_left_corner=Pos((idx * 7) + line_number * 7, line_number * 7), size=10))# - idx / 2))
         for idx
-        in range(0, 11, 2)
+        in range(11, 0, -2)
     ]
     cubes_lines.extend(cubes_line)
 
@@ -40,10 +41,12 @@ class MyWidget(Widget):
             (122, 122, 0),
         ]
 
+        texture = make_texture()
+
         with self.canvas:
-            for cube in cubes_lines:
+            for cube in reversed(cubes_lines):
                 for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
-                    cube.sides[side].draw()
+                    cube.sides[side].draw(texture=texture)
                     Color(*self.cube_sides_color_values[idx])
 
 
@@ -80,79 +83,3 @@ if __name__ == '__main__':
 
 
 
-
-
-
-# class Cube:
-#     def __init__(self, front_side_square_corners: List[Point]):
-#         self.front_side_square_corners = front_side_square_corners
-#
-#         self.size = size
-#
-#     def _calc_all_vertices(self):
-#         top_left_corner = Point().add_point(self.bottom_left_corner.x, 12)
-
-
-
-    # def on_pre_enter(self, *args):
-    #
-    #     TEXTURE_SIZE = 25
-    #     import itertools
-    #
-    #     border_width = 5
-    #
-    #     buf = []
-    #     for y in range(TEXTURE_SIZE):
-    #         buf.append([])
-    #         # print(f'Y: {y}')
-    #         for x in range(TEXTURE_SIZE):
-    #             buf[-1].extend([255, 255, 255, y + 1])  # - gradient from up to down
-    #
-    #
-    #     for row_number, row_data in enumerate(buf[::]):
-    #         buf[row_number] = bytes(row_data)
-    #
-    #     # buf = [[x, y] for x, y in itertools.product(range(size), range(size))]
-    #
-    #     buf = b''.join(itertools.chain(buf))
-    #     # then, convert the array to a ubyte string
-    #     # buf = ''.join(map(chr, buf)).encode()
-    #
-    #     self.texture = Texture.create(size=(TEXTURE_SIZE, TEXTURE_SIZE), bufferfmt='ubyte')
-    #     self.texture.wrap = 'clamp_to_edge'
-    #     # then blit the buffer
-    #     self.texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
-    #
-    #     rect_size = TEXTURE_SIZE
-    #     with self.canvas:
-    #         Color(255, 0, 0)
-    #         self.rect = Rectangle(size=[100, 200], pos=[0,0])#, size=(50,50), joint=False, close=False)
-
-
-    # def te(self, *args, **kwargs):
-    #     print(f'{args}\n{kwargs}')
-    #     # with self.
-    #     from math import radians
-    #
-    #     # do projection matrix
-    #
-    #     w, h = 700, 700
-    #     # w2, h2 = w / 2., h / 2.
-    #     # r = radians(45)
-    #
-    #     # projection_mat = Matrix()
-    #     # projection_mat.view_clip(0.0, w, 0.0, h, -1.0, 1.0, 0)
-    #     # self.canvas['projection_mat'] = projection_mat
-    #     #
-    #     # # do modelview matrix
-    #     # modelview_mat = Matrix().translate(w2, h2, 0)
-    #     # modelview_mat = modelview_mat.multiply(Matrix().rotate(r, 0, 0, 1))
-    #     #
-    #     # w, h = self.size
-    #     # w2, h2 = w / 2., h / 2.
-    #     # modelview_mat = modelview_mat.multiply(Matrix().translate(-w2, -h2, 0))
-    #     projection_mat = Matrix().scale(1,2,1)
-    #     self.canvas['projection_mat'] = projection_mat
-    #
-    #     self.canvas.ask_update()
-    #     # self.canvas.rect.scale(2)

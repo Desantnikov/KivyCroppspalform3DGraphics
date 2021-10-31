@@ -34,14 +34,14 @@ class CubeSide:
 
         return coords
 
-    def draw(self, ratio=10):
+    def draw(self, ratio=10, texture=None):
         mul_func = partial(imul, ratio)
 
-        return Quad(points=map(mul_func, self.get_coords()))
+        return Quad(points=map(mul_func, self.get_coords()), texture=texture)
 
 
 class Cube:
-    SIDES_DRAWING_ORDER = [SIDE.BACK, SIDE.RIGHT, SIDE.FRONT, SIDE.TOP]
+    SIDES_DRAWING_ORDER = [SIDE.RIGHT, SIDE.FRONT, SIDE.TOP]
 
     def __init__(self, front_bottom_left: Pos, front_top_left: Pos, front_top_right: Pos, front_bottom_right: Pos):
         self.half_edge_length = (front_top_left.y - front_bottom_left.y) / 2
