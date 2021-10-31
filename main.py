@@ -1,141 +1,30 @@
-from kivy.core.window import Window
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.app import ObjectProperty, StringProperty
-from plyer import gps, call, sms
 from kivy.app import App, Widget
-from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
 from kivy.uix.floatlayout import FloatLayout
-from kivy.graphics.texture import Texture
-from kivy.graphics import Line, Rectangle, Quad, Color, Point, Translate, RenderContext, ApplyContextMatrix
 from kivy.graphics import *
-from kivy.graphics.transformation import Matrix
-from kivy.clock import mainthread
-from kivy.utils import platform
-from kivy import kivy_examples_dir
-from kivy.uix.button import Button
 
-from enum import Enum, IntEnum
-from dataclasses import dataclass
-
-from typing import List, Union, Dict, Tuple
+from calculations.cube import Cube
+from calculations.pos import Pos
 
 
+def front_side_gen(bottom_left_corner: Pos, size: int):
+    corners_dict = {
+        'front_bottom_left': bottom_left_corner,
+        'front_top_left': bottom_left_corner.get_transformed_pos(0, size),
+        'front_top_right': bottom_left_corner.get_transformed_pos(size, size),
+        'front_bottom_right': bottom_left_corner.get_transformed_pos(size, 0),
+    }
+    return corners_dict
 
-class CUBE_SIDES(IntEnum):
-    FRONT = 0
-    TOP = 1
-    RIGHT = 2
-    BOTTOM = 3
-    LEFT = 4
-    BACK = 5
+cubes_lines = []
 
-
-@dataclass
-class Pos:
-    x: Union[int, float]
-    y: Union[int, float]
-
-    def get_transformed_pos(self, transform_x, transform_y):
-        x = self.x + transform_x
-        y = self.y + transform_y
-        return Pos(x, y)
-
-    def coords(self, coeffitient=10):
-        return self.x * coeffitient, self.y * coeffitient
-
-@dataclass
-class CubeSide:
-    side: CUBE_SIDES
-    corners: Tuple[Pos, ...]
-
-    def get_edge_length(self):
-        return self.corners[1].y - self.corners[0].y
-
-    def get_coords(self):
-        coords = []
-        for corner in self.corners:
-            coords.extend(corner.coords())
-
-        return coords
-
-    def draw(self):
-        Quad(points=self.get_coords())
-
-class Cube:
-    def __init__(self, front_side):
-        self.sides = {
-            CUBE_SIDES.FRONT: front_side,
-        }
-
-        self.half_edge_length = self.sides[CUBE_SIDES.FRONT].get_edge_length() / 2
-
-        self.sides[CUBE_SIDES.BACK] = self._calc_back_side()
-
-        # self.half_edge_length =
-
-        self.sides[CUBE_SIDES.TOP] = self._calc_top_side()
-        self.sides[CUBE_SIDES.RIGHT] = self._calc_right_side()
-
-    def _calc_back_side(self) -> CubeSide:
-        back_side = CubeSide(
-            side=CUBE_SIDES.BACK,
-            corners=tuple(
-                corner.get_transformed_pos(
-                    transform_x=self.half_edge_length,
-                    transform_y=self.half_edge_length,
-                )
-                for corner in self.sides[CUBE_SIDES.FRONT].corners
-            ),
-        )
-
-        return back_side
-
-    def _calc_top_side(self):
-        front_top_edge = self.sides[CUBE_SIDES.FRONT].corners[1], self.sides[CUBE_SIDES.FRONT].corners[2]
-        back_top_edge = self.sides[CUBE_SIDES.BACK].corners[2], self.sides[CUBE_SIDES.BACK].corners[1]
-
-        top_side = CubeSide(
-            side=CUBE_SIDES.TOP,
-            corners=front_top_edge + back_top_edge,
-        )
-
-        return top_side
-
-    def _calc_right_side(self):
-        front_right_edge = self.sides[CUBE_SIDES.FRONT].corners[2], self.sides[CUBE_SIDES.FRONT].corners[3]
-        back_right_edge = self.sides[CUBE_SIDES.BACK].corners[3], self.sides[CUBE_SIDES.BACK].corners[2]
-
-        right_side = CubeSide(
-            side=CUBE_SIDES.RIGHT,
-            corners=front_right_edge + back_right_edge,
-        )
-
-        return right_side
-
-
-front_bottom_left = Pos(10, 10)
-front_top_left = Pos(10, 20)
-front_top_right = Pos(20, 20)
-front_bottom_right = Pos(20, 10)
-
-front_side = CubeSide(
-    side=CUBE_SIDES.FRONT,
-    corners=(
-        front_bottom_left,
-        front_top_left,
-        front_top_right,
-        front_bottom_right,
-    ),
-)
-
-cube = Cube(front_side=front_side)
-
-
-
-
-
-
-
+for line_number in range(10):
+    cubes_line = [
+        Cube(**front_side_gen(bottom_left_corner=Pos((idx * 10) + line_number * 10, line_number * 10), size=10))# - idx / 2))
+        for idx
+        in range(0, 11, 2)
+    ]
+    cubes_lines.extend(cubes_line)
 
 
 
@@ -144,21 +33,25 @@ class MyWidget(Widget):
         self.rect = None
         super(MyWidget, self).__init__(**kwargs)
 
+        self.cube_sides_color_values = [
+            (255, 0, 0),
+            (0, 255, 0),
+            (0, 0, 255),
+            (122, 122, 0),
+        ]
+
         with self.canvas:
-            cube.sides[CUBE_SIDES.BACK].draw()
-            Color(0, 255, 0)
-            #
-            cube.sides[CUBE_SIDES.RIGHT].draw()
-            Color(255, 0, 0)
-
-            cube.sides[CUBE_SIDES.FRONT].draw()
-
-            Color(0, 0,255)
-            cube.sides[CUBE_SIDES.TOP].draw()
+            for cube in cubes_lines:
+                for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
+                    cube.sides[side].draw()
+                    Color(*self.cube_sides_color_values[idx])
 
 
 class RootWidgetBoxLayout(FloatLayout):
     def __init__(self, **kwargs):
+
+        # Window.height = 1200
+
         super(RootWidgetBoxLayout, self).__init__(**kwargs)
 
         my_widget = MyWidget()
@@ -167,6 +60,9 @@ class RootWidgetBoxLayout(FloatLayout):
 
 class MyApp(App):
     def build(self):
+        Window.size = (1000, 800)
+        Window.top = 100
+
         self.root = root = RootWidgetBoxLayout()
 
         return root
