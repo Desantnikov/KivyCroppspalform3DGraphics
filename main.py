@@ -8,7 +8,7 @@ from calculations.pos import Pos
 from shadow_texture import make_texture
 
 
-def front_side_gen(bottom_left_corner: Pos, size: int):
+def points_generate(bottom_left_corner: Pos, size: int):
     corners_dict = {
         'front_bottom_left': bottom_left_corner,
         'front_top_left': bottom_left_corner.get_transformed_pos(0, size),
@@ -17,21 +17,29 @@ def front_side_gen(bottom_left_corner: Pos, size: int):
     }
     return corners_dict
 
-cubes_lines = []
+
+ROW_LENGTH = 5
+Y_OFFSET = 1
+
+POSITION_MULTIPLIER = 7
+CUBE_SIZE = 10
 
 
-ROW_LENGTH = 10
-POSITION_MULTIPLIER = 4
+cubes_plot = []
+for row_number in range(Y_OFFSET, ROW_LENGTH+Y_OFFSET):
+    cubes_row = []
 
+    for cube_number in range(ROW_LENGTH * 2, 0, -2):
+        front_side_points = points_generate(
+            bottom_left_corner=Pos(
+                cube_number * POSITION_MULTIPLIER + row_number * POSITION_MULTIPLIER,
+                row_number * POSITION_MULTIPLIER,
+            ),
+            size=CUBE_SIZE,
+        )
 
-
-for line_number in range(1, 11):
-    cubes_line = [
-        Cube(**front_side_gen(bottom_left_corner=Pos((idx * POSITION_MULTIPLIER) + line_number * POSITION_MULTIPLIER, line_number * POSITION_MULTIPLIER), size=5))# - idx / 2))
-        for idx
-        in range(20, 0, -2)
-    ]
-    cubes_lines.extend(cubes_line)
+        cubes_row.append(Cube(**front_side_points))
+    cubes_plot.append(cubes_row)
 
 
 class MyWidget(Widget):
@@ -44,20 +52,30 @@ class MyWidget(Widget):
             (1, 1, 1),
             (0.3, 0.3, 0.3),
         ]
+
         self.sides = []
         with self.canvas:
-            for cube in reversed(cubes_lines):
-                for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
-                    self.sides.append(cube.sides[side].draw())
-                    Color(rgb=self.cube_sides_color_values[idx])
+            Color(rgb=(self.cube_sides_color_values[2]))
+
+            for row in reversed(cubes_plot):
+                for cube in reversed(row):
+                    for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
+
+                        self.sides.append(cube.sides[side].draw())
+
+                        Color(rgb=self.cube_sides_color_values[idx])
 
         from kivy.animation import Animation
-        texture = make_texture()
+        from calculations.cube import SIDE
 
-        points = [1 - 3 * point for point in self.sides[-1].points]
+        initial_coord_values = cubes_plot[0][0].sides[SIDE.TOP].get_coords()
+        modified_coord_values = [idx + coord * 20 if idx % 2 else coord * idx for idx, coord in enumerate(initial_coord_values)]
 
-        anim = Animation(points=points, duration=10)
-        anim.start(self.sides[-1])
+        anim = Animation(points=modified_coord_values, duration=3)
+        # anim.start(self.sides[-22])
+        # anim.start(self.sides[-5])
+        # anim.start(self.sides[-30])
+
 
 class RootWidgetBoxLayout(FloatLayout):
     def __init__(self, **kwargs):
@@ -65,7 +83,8 @@ class RootWidgetBoxLayout(FloatLayout):
 
         self.bind(
             size=self._update_rect,
-            pos=self._update_rect
+            pos=self._update_rect,
+            on_resize=self._update_rect,
         )
 
         my_widget = MyWidget()
@@ -73,38 +92,52 @@ class RootWidgetBoxLayout(FloatLayout):
 
 
         with self.canvas.before:
-            Color(rgb=(255, 255, 255))
-
-            left_bottom_corner = Pos(0, 800)
+            Color(rgb=(228,228,228))
 
             texture = make_texture()
             self.rect = Rectangle(pos=self.pos, size=self.size, texture=texture)
 
 
-            # self.back_wall = Rectangle()
-            # self.rect = Rectangle(pos=self.pos, size=self.size)
+
+
+            points = [
+                Pos(10, 10),
+                Pos(450, 450),
+                Pos(1600, 450),
+                Pos(1600, 10),
+            ]
+
+            from itertools import chain
+
+            pos_coords = chain(*[pos.coords() for pos in points])
+
+            Color(rgb=(0.9,0.4,0.4))
+            self.rect_two = Quad(points=pos_coords)#, texture=make_texture(1000))  # , texture=texture)
+
+
 
     def _update_rect(self, instance, value):
-
         self.rect.pos = instance.pos
-        # self.rect.pos = 400
-        # x, y = self.rect.pos
-        # self.rect.pos = (x, y+425)
-
         self.rect.size = instance.size
 
 
 class MyApp(App):
     def build(self):
-        # Window.clearcolor = (1, 1, 1, 1)
+        self.bind(on_resize=self._update_rect)
+
         Window.size = (1400, 800)
         Window.top = 100
         Window.left = 100
-        # Window.pos(100,100)
+        # Window.clearcolor = (0.9, 0.9, 0.9, 0.5)
 
         self.root = root = RootWidgetBoxLayout()
 
         return root
+
+    def _update_rect(self, instance, value):
+        self.top = instance.top
+        self.left = instance.left
+        self.size = instance.size
 
 
 if __name__ == '__main__':

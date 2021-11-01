@@ -22,7 +22,7 @@ def make_texture(width=600):
     buf = bytes(gradient.tobytes())
 
     texture = Texture.create(size=(width, width+200), bufferfmt='ubyte', callback=print)
-    texture.wrap = 'clamp_to_edge'
+    texture.wrap = 'repeat'
     texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
 
     # gradient.show()
