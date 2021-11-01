@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from functools import partial
 from operator import imul
-from typing import Tuple
+from typing import Tuple, Iterable
 
 from kivy.graphics.vertex_instructions import Quad
 
@@ -21,7 +21,7 @@ class SIDE(IntEnum):
 @dataclass
 class CubeSide:
     side: SIDE
-    corners: Tuple[Pos, ...]
+    corners: Iterable[Pos]
 
     def get_edge_length(self):
         assert self.side in [SIDE.FRONT, SIDE.BACK], 'Only front and back sides are 100% valid for this'
@@ -43,39 +43,40 @@ class CubeSide:
 class Cube:
     SIDES_DRAWING_ORDER = [SIDE.RIGHT, SIDE.FRONT, SIDE.TOP]
 
-    def __init__(self, front_bottom_left: Pos, front_top_left: Pos, front_top_right: Pos, front_bottom_right: Pos):
-        self.half_edge_length = (front_top_left.y - front_bottom_left.y) / 2
-
-        self.front_bottom_left = front_bottom_left
-        self.front_top_left = front_top_left
-        self.front_top_right = front_top_right
-        self.front_bottom_right = front_bottom_right
+    def __init__(self, front_bottom_left: Pos, size: int):  #, front_bottom_left: Pos, front_top_left: Pos, front_top_right: Pos, front_bottom_right: Pos):
+        self.size = size
 
         self.sides = {}
-        self.sides[SIDE.FRONT] = self._calc_front_side()  # Calculation order is important
+        self.sides[SIDE.FRONT] = self._calc_front_side(front_bottom_left)  # Calculation order is important
         self.sides[SIDE.BACK] = self._calc_back_side()
         self.sides[SIDE.TOP] = self._calc_top_side()
         self.sides[SIDE.RIGHT] = self._calc_right_side()
 
-    def _calc_front_side(self) -> CubeSide:
-        front_side = CubeSide(
+    @staticmethod
+    def _front_side_coords_calculate(bottom_left_corner: Pos, size: int):
+        pos_dicts = {
+            'front_bottom_left': bottom_left_corner,
+            'front_top_left': bottom_left_corner.get_transformed_pos(0, size),
+            'front_top_right': bottom_left_corner.get_transformed_pos(size, size),
+            'front_bottom_right': bottom_left_corner.get_transformed_pos(size, 0),
+        }
+        return pos_dicts
+
+    def _calc_front_side(self, bottom_left_corner) -> CubeSide:
+        pos_dict = self._front_side_coords_calculate(bottom_left_corner, self.size)
+
+        return CubeSide(
             side=SIDE.FRONT,
-            corners=(
-                self.front_bottom_left,
-                self.front_top_left,
-                self.front_top_right,
-                self.front_bottom_right,
-            ),
+            corners=tuple(pos_dict.values()),
         )
-        return front_side
 
     def _calc_back_side(self) -> CubeSide:
         back_side = CubeSide(
             side=SIDE.BACK,
             corners=tuple(
                 corner.get_transformed_pos(
-                    transform_x=self.half_edge_length,
-                    transform_y=self.half_edge_length,
+                    transform_x=self.size/2,
+                    transform_y=self.size/2,
                 )
                 for corner in self.sides[SIDE.FRONT].corners
             ),
