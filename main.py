@@ -10,23 +10,28 @@ from calculations.pos import Pos
 from shadow_texture import make_texture
 
 
-ROW_LENGTH = 5
+ROW_LENGTH = 7
 Y_OFFSET = 1
-POSITION_MULTIPLIER = 7
-CUBE_SIZE = 10
+POSITION_MULTIPLIER = 6
+HEIGHT_MULTIPLIER = 9
+CUBE_SIZE = 6
 
 
-cubes_plot = []
-for row_number in range(Y_OFFSET, ROW_LENGTH + Y_OFFSET):
+cubes_array = []
+for height_level in range(ROW_LENGTH): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
 
-    cubes_row = []
-    for cube_number in range(ROW_LENGTH * 2, 0, -2):
-        pos = Pos(
-            cube_number * POSITION_MULTIPLIER + row_number * POSITION_MULTIPLIER,
-            row_number * POSITION_MULTIPLIER,
-        )
-        cubes_row.append(Cube(front_bottom_left=pos, size=CUBE_SIZE))
-    cubes_plot.append(cubes_row)
+    cubes_plot = []
+    for row_number in range(ROW_LENGTH):#Y_OFFSET, ROW_LENGTH + Y_OFFSET):
+
+        cubes_row = []
+        for cube_number in range(ROW_LENGTH * 2, 0, -2):
+            pos = Pos(
+                cube_number * POSITION_MULTIPLIER + row_number * POSITION_MULTIPLIER,
+                row_number * POSITION_MULTIPLIER + (5 + height_level * HEIGHT_MULTIPLIER),
+            )
+            cubes_row.append(Cube(front_bottom_left=pos, size=CUBE_SIZE))
+        cubes_plot.append(cubes_row)
+    cubes_array.append(cubes_plot)
 
 
 class MyWidget(Widget):
@@ -44,12 +49,13 @@ class MyWidget(Widget):
         with self.canvas:
             Color(rgb=(self.cube_sides_color_values[2]))
 
-            for row in reversed(cubes_plot):
-                for cube in reversed(row):
-                    for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
-                        self.sides.append(cube.sides[side].draw())
+            for plot in cubes_array:
+                for row in reversed(plot):
+                    for cube in reversed(row):
+                        for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
+                            self.sides.append(cube.sides[side].draw())
 
-                        Color(rgb=self.cube_sides_color_values[idx])
+                            Color(rgb=self.cube_sides_color_values[idx])
 
         from kivy.animation import Animation
         from calculations.cube import SIDE
