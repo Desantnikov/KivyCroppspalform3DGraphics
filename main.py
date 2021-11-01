@@ -5,16 +5,26 @@ from kivy.core.window import Window
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 
-from calculations.cube import Cube
+from calculations.cube import Cube, SIDE
 from calculations.pos import Pos
 from shadow_texture import make_texture
 
 
-ROW_LENGTH = 7
-Y_OFFSET = 1
-POSITION_MULTIPLIER = 6
-HEIGHT_MULTIPLIER = 9
+ROW_LENGTH = 5
+
+# multipliers
+SPACES_X = 6  # two-axis coords
+SPACES_Y = 8
 CUBE_SIZE = 6
+
+SHADOW_MULTIPLIER = 0.1
+SHADOW_DELTA_MULTIPLIER = 0.1
+
+#direct values
+X_OFFSET = 0
+Y_OFFSET = 0
+
+INITIAL_BRIGHTNESS = 0.8
 
 
 cubes_array = []
@@ -26,12 +36,13 @@ for height_level in range(ROW_LENGTH): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
         cubes_row = []
         for cube_number in range(ROW_LENGTH * 2, 0, -2):
             pos = Pos(
-                cube_number * POSITION_MULTIPLIER + row_number * POSITION_MULTIPLIER,
-                row_number * POSITION_MULTIPLIER + (5 + height_level * HEIGHT_MULTIPLIER),
+                cube_number * SPACES_X + row_number * SPACES_X + X_OFFSET,
+                row_number * SPACES_X + (5 + height_level * SPACES_Y),
             )
             cubes_row.append(Cube(front_bottom_left=pos, size=CUBE_SIZE))
         cubes_plot.append(cubes_row)
     cubes_array.append(cubes_plot)
+
 
 
 class MyWidget(Widget):
@@ -39,23 +50,68 @@ class MyWidget(Widget):
         self.rect = None
         super(MyWidget, self).__init__(**kwargs)
 
-        self.cube_sides_color_values = [
-            (0.6, 0.6, 0.6),
-            (1, 1, 1),
-            (0.3, 0.3, 0.3),
-        ]
+        # self.cube_sides_color_values = [
+        #     (0.6, 0.6, 0.6),
+        #     (1, 1, 1),
+        #     (0.3, 0.3, 0.3),
+        # ]
+
+        from calculations.cube import SIDE
+
+
+        self.sides_color_values = {
+            side: (
+                INITIAL_BRIGHTNESS,
+                INITIAL_BRIGHTNESS,
+                INITIAL_BRIGHTNESS,
+            )
+            for side
+            in Cube.SIDES_DRAWING_ORDER
+        }
+
 
         self.sides = []
         with self.canvas:
-            Color(rgb=(self.cube_sides_color_values[2]))
+            for plot_idx, plot in enumerate(cubes_array):  # height (z)
 
-            for plot in cubes_array:
-                for row in reversed(plot):
-                    for cube in reversed(row):
-                        for idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
+                for row_idx, row in enumerate(reversed(plot)):  # rows from back to front
+
+
+                    for cube_idx, cube in enumerate(reversed(row)):  # cubes from left to right  #
+
+                        for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
+
+
+                            def _colors_update(color_tuple, side_shadow_multiplier):
+                                if side_shadow_multiplier == 0:
+                                    side_shadow_multiplier = 1
+
+                                side_shadow_multiplier = side_shadow_multiplier * SHADOW_MULTIPLIER
+
+                                return [color_part * side_shadow_multiplier for color_part in color_tuple[::]]
+
+                            side_shadow_multiplier_map = {
+                                SIDE.TOP: (plot_idx * SPACES_Y) * SHADOW_DELTA_MULTIPLIER,
+                                SIDE.FRONT: row_idx * SHADOW_DELTA_MULTIPLIER,
+                                SIDE.RIGHT: cube_idx * (SPACES_X + SPACES_Y) * SHADOW_DELTA_MULTIPLIER,
+                            }
+
+
+                            color = self.sides_color_values[side]
+
+
+
+
+
+                            color_updated = _colors_update(color_tuple=color, side_shadow_multiplier=side_shadow_multiplier_map[side])
+
+                            Color(rgb=color_updated)
                             self.sides.append(cube.sides[side].draw())
 
-                            Color(rgb=self.cube_sides_color_values[idx])
+
+
+
+                    # list(map(self.canvas.remove, self.sides[-row_idx:]))
 
         from kivy.animation import Animation
         from calculations.cube import SIDE
@@ -111,8 +167,8 @@ class MyApp(App):
     def build(self):
         self.bind(on_resize=self._update_rect)
 
-        Window.size = (1400, 800)
-        Window.top = 100
+        Window.size = (1400, 1000)
+        Window.top = 20
         Window.left = 100
         # Window.clearcolor = (0.9, 0.9, 0.9, 0.5)
 
