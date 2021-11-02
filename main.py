@@ -10,22 +10,20 @@ from calculations.pos import Pos
 from shadow_texture import make_texture
 
 
-ROW_LENGTH = 5
+ROW_LENGTH = 6 # should be dividable by 2
 
 # multipliers
 SPACES_X = 6  # two-axis coords
-SPACES_Y = 8
-CUBE_SIZE = 6
+SPACES_Y = 9
+CUBE_SIZE = 7
 
-SHADOW_MULTIPLIER = 0.1
-SHADOW_DELTA_MULTIPLIER = 0.1
+BRIGHTNESS_MULTIPLIER = 0.0001  #
 
 #direct values
-X_OFFSET = 0
+X_OFFSET = 3
 Y_OFFSET = 0
 
-INITIAL_BRIGHTNESS = 0.8
-
+INITIAL_BRIGHTNESS = 0.6
 
 cubes_array = []
 for height_level in range(ROW_LENGTH): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
@@ -50,10 +48,10 @@ class MyWidget(Widget):
         self.rect = None
         super(MyWidget, self).__init__(**kwargs)
 
-        # self.cube_sides_color_values = [
-        #     (0.6, 0.6, 0.6),
-        #     (1, 1, 1),
-        #     (0.3, 0.3, 0.3),
+        # self.sides_color_values = [
+        #     (0.7, 0.7, 0.7),  # right
+        #     (0.6, 0.6, 0.6),  # front
+        #     (1, 1, 1),  # top
         # ]
 
         from calculations.cube import SIDE
@@ -72,38 +70,33 @@ class MyWidget(Widget):
 
         self.sides = []
         with self.canvas:
-            for plot_idx, plot in enumerate(cubes_array):  # height (z)
+            for plot_idx, plot in enumerate(cubes_array, start=2):  # height (z)
 
-                for row_idx, row in enumerate(reversed(plot)):  # rows from back to front
+                for row_idx, row in enumerate(reversed(plot), start=2):  # rows from back to front
 
+                    for cube_idx, cube in enumerate(reversed(row), start=2):  # cubes from left to right  #
+                        side_shadow_multiplier_map = {
+                            SIDE.TOP: row_idx * cube_idx * plot_idx * plot_idx * plot_idx,#((cube_idx)) * plot_idx * plot_idx * plot_idx * (SPACES_X + SPACES_Y) - plot_idx,
+                            SIDE.FRONT: row_idx * cube_idx * cube_idx * cube_idx,#plot_idx * (cube_idx) * (SPACES_X + SPACES_Y),
+                            SIDE.RIGHT: cube_idx * cube_idx * cube_idx * cube_idx,#plot_idx * (row_idx) * (SPACES_X + SPACES_Y),
+                        }
 
-                    for cube_idx, cube in enumerate(reversed(row)):  # cubes from left to right  #
 
                         for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
 
 
                             def _colors_update(color_tuple, side_shadow_multiplier):
-                                if side_shadow_multiplier == 0:
+                                if side_shadow_multiplier < 1:
                                     side_shadow_multiplier = 1
 
-                                side_shadow_multiplier = side_shadow_multiplier * SHADOW_MULTIPLIER
+                                return [color_part * side_shadow_multiplier * BRIGHTNESS_MULTIPLIER for color_part in color_tuple[::]]
 
-                                return [color_part * side_shadow_multiplier for color_part in color_tuple[::]]
-
-                            side_shadow_multiplier_map = {
-                                SIDE.TOP: (plot_idx * SPACES_Y) * SHADOW_DELTA_MULTIPLIER,
-                                SIDE.FRONT: row_idx * SHADOW_DELTA_MULTIPLIER,
-                                SIDE.RIGHT: cube_idx * (SPACES_X + SPACES_Y) * SHADOW_DELTA_MULTIPLIER,
-                            }
-
+                            side_shadow_multiplier = side_shadow_multiplier_map[side]
+                            # if cube_idx == len(cubes_row) - 1:
+                            #     side_shadow_multiplier =
 
                             color = self.sides_color_values[side]
-
-
-
-
-
-                            color_updated = _colors_update(color_tuple=color, side_shadow_multiplier=side_shadow_multiplier_map[side])
+                            color_updated = _colors_update(color_tuple=color, side_shadow_multiplier=side_shadow_multiplier)
 
                             Color(rgb=color_updated)
                             self.sides.append(cube.sides[side].draw())
