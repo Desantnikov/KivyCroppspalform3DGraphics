@@ -19,7 +19,7 @@ SPACES_X =9 # two-axis coords
 
 CUBE_SIZE = 13
 
-BRIGHTNESS_MULTIPLIER = 0.1 #
+BRIGHTNESS_MULTIPLIER = 0.15 #
 
 #direct values
 X_OFFSET = 3
@@ -57,9 +57,10 @@ class MyWidget(Widget):
         super(MyWidget, self).__init__(**kwargs)
 
         self.sides_color_values = [
-            (1, 1, 0.999),  # right
-            (1, 0.999, 1),  # front
-            (0.999, 1, 1),  # top
+            (0.6, 0.6, 0.6),  # front
+
+             (0.80, 0.80, 0.80),  # top
+            (1, 1, 1),  # right
         ]
 
         from calculations.cube import SIDE
@@ -110,12 +111,11 @@ class MyWidget(Widget):
 
 
                             Color(rgb=color_updated)
-                            self.sides.append(cube.sides[side].draw())
+                            cube.sides[side].draw()
 
 
 
-        from kivy.animation import Animation
-        from calculations.cube import SIDE
+
 
 
     def on_touch_up(self, touch):
@@ -124,32 +124,38 @@ class MyWidget(Widget):
             for x in z:
                 for cube in x:
                     for side in cube.sides.values():
+                        if not side.drawed:
+                            continue
+
                         touch_x = touch.pos[0]
                         touch_y = touch.pos[1]
 
-                        if touch_x > side.corners[0].x * CUBE_SIZE and touch_y > side.corners[0].y * CUBE_SIZE:
-                            print('1')
-                            if touch_x < side.corners[2].x * CUBE_SIZE and touch_y < side.corners[2].y * CUBE_SIZE:
-                                print('2')
+                        if touch_x > side.corners[0].x * 10 and touch_y > side.corners[0].y * 10:
+                            if touch_x < side.corners[2].x * 10 and touch_y < side.corners[2].y * 10:
 
-                                print('Found cube!')
 
-                                initial_coord_values = cube.sides[SIDE.TOP].get_coords()
+                                initial_coord_values = side.get_coords(after_ratio=True)
 
                                 modified_coord_values = [
-                                    idx + coord * 20
-                                    if idx % 2
-                                    else
-                                    coord * idx
+                                    coord - 25
+                                    if idx in [0, 1, 2, 7] else
+
+                                    coord + 25
+
                                     for idx, coord
                                     in enumerate(initial_coord_values)
                                 ]
+
+                                from kivy.animation import Animation, AnimationTransition
+                                from calculations.cube import SIDE
+
                                 from kivy.animation import Animation
-                                anim = Animation(points=modified_coord_values, duration=3)
-                                anim.start(self.sides[-1])
+                                anim = Animation(points=modified_coord_values, duration=1, transition='out_elastic')
 
+                                anim += Animation(points=initial_coord_values, duration=0.5, transition='in_back')
+                                anim.start(side.drawed)
 
-
+                                return
 
 
 class RootWidgetBoxLayout(FloatLayout):
@@ -164,18 +170,25 @@ class RootWidgetBoxLayout(FloatLayout):
 
     def draw_background(self):
         with self.canvas.before:
-            Color(rgb=(228, 228, 228))
-
-            self.rect = Rectangle(pos=self.pos, size=self.size, texture=make_texture())
+            Color(rgb=(0.8, 0.8, 0.8))
 
             points = [Pos(10, 10), Pos(450, 450), Pos(1600, 450), Pos(1600, 10)]
+            pos_coords = chain(*[pos.coords() for pos in points])
+            self.rect_two = Quad(points=pos_coords)  # bottom textureo of a scene
 
+            Color(rgb=(0.7, 0.7, 0.7))
 
-
+            points = [Pos(10, 10), Pos(10, 1200), Pos(450, 1200), Pos(450, 450)]
             pos_coords = chain(*[pos.coords() for pos in points])
 
-            Color(rgb=(0.9, 0.4, 0.4))
-            self.rect_two = Quad(points=pos_coords)  # , texture=make_texture(1000))  # , texture=texture)
+            self.rect_three = Quad(points=pos_coords)
+
+            Color(rgb=(0.75, 0.75, 0.75))
+
+            text = make_texture(500)
+            points = [Pos(450, 450), Pos(450, 1200), Pos(1600, 1200), Pos(1600, 450)]
+            pos_coords = chain(*[pos.coords() for pos in points])
+            self.rect_four = Quad(points=pos_coords, texture=text)
 
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos

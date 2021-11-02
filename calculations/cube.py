@@ -18,26 +18,37 @@ class SIDE(IntEnum):
     BACK = 5
 
 
-@dataclass
+
 class CubeSide:
-    side: SIDE
-    corners: Iterable[Pos]
+    DRAWING_RATIO = 10
+
+    ratio_func = partial(imul, DRAWING_RATIO)
+
+    def __init__(self, side,  corners):
+        self.corners = corners
+        self.side = side
+
+        self.drawed = None
+
+
 
     def get_edge_length(self):
         assert self.side in [SIDE.FRONT, SIDE.BACK], 'Only front and back sides are 100% valid for this'
         return self.corners[1].y - self.corners[0].y
 
-    def get_coords(self):
+    def get_coords(self, after_ratio=False):
         coords = []
         for corner in self.corners:
-            coords.extend(corner.coords())
+            coords.extend(corner.coords() if not after_ratio else map(self.ratio_func, corner.coords()))
 
         return coords
 
-    def draw(self, ratio=10, texture=None):
-        mul_func = partial(imul, ratio)
+    def draw(self, texture=None):
 
-        return Quad(points=map(mul_func, self.get_coords()), texture=texture)
+
+        quad = Quad(points=map(CubeSide.ratio_func, self.get_coords()), texture=texture)
+        self.drawed = quad
+        return quad
 
 
 class Cube:
