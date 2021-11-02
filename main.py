@@ -11,13 +11,13 @@ from shadow_texture import make_gradient_texture
 
 
 ROW_LENGTH = 4 # should be dividable by 2
-HEIGHT = 1
+HEIGHT = 3
 DEPTH = 4
 
 # multipliers
 SPACES_X = 9 # two-axis coords
 
-CUBE_SIZE = 13
+CUBE_SIZE = 10
 
 BRIGHTNESS_MULTIPLIER = 0.15 #
 
@@ -25,7 +25,7 @@ BRIGHTNESS_MULTIPLIER = 0.15 #
 X_OFFSET = 3
 Y_OFFSET = 2
 
-SPACES_Y = 7
+SPACES_Y = 15
 
 INITIAL_BRIGHTNESS = .7
 
@@ -112,9 +112,9 @@ class MyWidget(Widget):
 
     def on_touch_up(self, touch):
         print(touch)
-        for z in cubes_array:
-            for x in z:
-                for cube in x:
+        for z in reversed(cubes_array):
+            for x in reversed(z):
+                for cube in reversed(x):
                     for side in cube.sides.values():
                         if not side.drawed:
                             continue
@@ -157,7 +157,7 @@ class RootWidgetBoxLayout(FloatLayout):
         self.bind(on_resize=self._update_rect)
         self.draw_background()
 
-        my_widget = MyWidget(size=(500,500))
+        my_widget = MyWidget(size=(1200, 1200))
         self.add_widget(my_widget)
 
     def draw_background(self):
@@ -193,7 +193,7 @@ class MyApp(App):
         Window.size = (1400, 1000)
         Window.top = 40
         Window.left = 100
-        # Window.clearcolor = (0.9, 0.9, 0.9, 0.5)
+        # Window.clearcolor = (0.9, 0.9, 0.9)
 
         self.root = root = RootWidgetBoxLayout()
 
