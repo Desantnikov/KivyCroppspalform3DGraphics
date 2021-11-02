@@ -3,12 +3,15 @@ from PIL import Image, ImageFilter, ImageDraw
 
 RAD_MULT = 0.25
 
-def make_gradient_texture(width=500, light_direction='left_to_right', rotate=None, brightness_increase=None):
-    gradient = Image.new('RGBA', (width, width), color=(1))
+def make_gradient_texture(width=500, height=None, light_direction='left_to_right', rotate=None, brightness_increase=None):
+    if height is None:
+        height = width
+
+    gradient = Image.new('RGBA', (width, height), color=(1))
     draw = ImageDraw.Draw(gradient, mode='RGBA')
 
     for x in range(width):
-        for y in range(width):
+        for y in range(height):
             color = int((x+y)/2)
 
             if light_direction == 'downside':
@@ -24,8 +27,8 @@ def make_gradient_texture(width=500, light_direction='left_to_right', rotate=Non
             else:
                 raise Exception('wrong directon')
 
-            if brightness_increase is not None:
-                color += brightness_increase
+            if brightness_increase is not None and  color < brightness_increase:
+                color = brightness_increase
 
             draw.line([start, end],  (255, 255, 255, color), width=1)
 
@@ -40,7 +43,7 @@ def make_gradient_texture(width=500, light_direction='left_to_right', rotate=Non
 
     buf = bytes(gradient.tobytes())
 
-    texture = Texture.create(size=(width, width), bufferfmt='ubyte')
+    texture = Texture.create(size=(width, height), bufferfmt='ubyte')
     texture.wrap = 'clamp_to_edge'
     texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
 

@@ -15,7 +15,7 @@ HEIGHT = 1
 DEPTH = 4
 
 # multipliers
-SPACES_X =9 # two-axis coords
+SPACES_X = 9 # two-axis coords
 
 CUBE_SIZE = 13
 
@@ -23,7 +23,7 @@ BRIGHTNESS_MULTIPLIER = 0.15 #
 
 #direct values
 X_OFFSET = 3
-Y_OFFSET = 0
+Y_OFFSET = 2
 
 SPACES_Y = 7
 
@@ -38,7 +38,7 @@ for height_level in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
         for real_cube_nuber, cube_number in enumerate(range(ROW_LENGTH * 2, 0, -2)):
             pos = Pos(
                 x=(cube_number * SPACES_X + row_number * SPACES_X + X_OFFSET),
-                y=(row_number * SPACES_X + (5 + height_level * SPACES_Y)),
+                y=(row_number * SPACES_X + (5 + height_level * SPACES_Y)) + Y_OFFSET,
             )
             cubes_row.append(Cube(front_bottom_left=pos, size=CUBE_SIZE, resize_back_size=0))
 
@@ -60,7 +60,7 @@ class MyWidget(Widget):
             (0.6, 0.6, 0.6),  # front
 
              (0.80, 0.80, 0.80),  # top
-            (1, 1, 1),  # right
+            (0.95, 0.95, 0.95),  # right
         ]
 
         from calculations.cube import SIDE
@@ -102,20 +102,12 @@ class MyWidget(Widget):
 
                             side_shadow_multiplier = side_shadow_multiplier_map[side]
 
-
-
-
                             color = self.sides_color_values[side]
-                            color_updated = _colors_update(color_tuple=color,
-                                                           side_shadow_multiplier=side_shadow_multiplier)
+                            color_updated = _colors_update(color_tuple=color, side_shadow_multiplier=side_shadow_multiplier)
 
 
                             Color(rgb=color_updated)
                             cube.sides[side].draw()
-
-
-
-
 
 
     def on_touch_up(self, touch):
@@ -175,7 +167,7 @@ class RootWidgetBoxLayout(FloatLayout):
             points = [Pos(10, 10), Pos(450, 450), Pos(1600, 450), Pos(1600, 10)]  # "floor"
             pos_coords = chain(*[pos.coords() for pos in points])
 
-            self.rect_two = Quad(points=pos_coords, texture=make_gradient_texture(width=150, light_direction='left_bottom_to_right_top', brightness_increase=100, rotate=-90))
+            self.rect_two = Quad(points=pos_coords, texture=make_gradient_texture(width=150, light_direction='left_bottom_to_right_top', brightness_increase=75, rotate=-90))
 
 
 
@@ -184,7 +176,7 @@ class RootWidgetBoxLayout(FloatLayout):
             self.rect_three = Quad(points=pos_coords, texture=make_gradient_texture(width=200, light_direction='left_bottom_to_right_top', rotate=90, brightness_increase=100))
 
             # Color(rgb=(0.75, 0.75, 0.75))
-            points = [Pos(450, 450), Pos(450, 1200), Pos(1600, 1200), Pos(1600, 450)]  # "backgroud"
+            points = [Pos(450, 450), Pos(450, 1600), Pos(1600, 1600), Pos(1600, 450)]  # "backgroud"
             pos_coords = chain(*[pos.coords() for pos in points])
             self.rect_four = Quad(points=pos_coords, texture=make_gradient_texture(width=200, light_direction='left_bottom_to_right_top', brightness_increase=105))
 
@@ -198,8 +190,8 @@ class MyApp(App):
     def build(self):
         self.bind(on_resize=self._update_rect)
 
-        Window.size = (1400, 600)
-        Window.top = 20
+        Window.size = (1400, 1000)
+        Window.top = 40
         Window.left = 100
         # Window.clearcolor = (0.9, 0.9, 0.9, 0.5)
 
