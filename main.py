@@ -150,9 +150,9 @@ class MyWidget(Widget):
                                 from calculations.cube import SIDE
 
                                 from kivy.animation import Animation
-                                anim = Animation(points=modified_coord_values, duration=1, transition='out_elastic')
+                                anim = Animation(points=modified_coord_values, duration=0.7, transition='out_elastic')
 
-                                anim += Animation(points=initial_coord_values, duration=0.5, transition='in_back')
+                                anim += Animation(points=initial_coord_values, duration=0.3, transition='in_back')
                                 anim.start(side.drawed)
 
                                 return
@@ -170,24 +170,24 @@ class RootWidgetBoxLayout(FloatLayout):
 
     def draw_background(self):
         with self.canvas.before:
-
             Color(rgb=(1,1,1))
+
             points = [Pos(10, 10), Pos(450, 450), Pos(1600, 450), Pos(1600, 10)]  # "floor"
             pos_coords = chain(*[pos.coords() for pos in points])
-            self.rect_two = Quad(points=pos_coords, texture=make_gradient_texture(500, light_direction='left_bottom_to_right_top', rotate=-90))
 
-            # Color(rgb=(0.7, 0.7, 0.7))
+            self.rect_two = Quad(points=pos_coords, texture=make_gradient_texture(width=150, light_direction='left_bottom_to_right_top', brightness_increase=100, rotate=-90))
+
+
 
             points = [Pos(10, 10), Pos(10, 1200), Pos(450, 1200), Pos(450, 450)]  # "left wall"
-            Color(rgb=(1, 1, 1))
             pos_coords = chain(*[pos.coords() for pos in points])
-            self.rect_three = Quad(points=pos_coords, texture=make_gradient_texture(500, light_direction='left_bottom_to_right_top', rotate=90))
+            self.rect_three = Quad(points=pos_coords, texture=make_gradient_texture(width=200, light_direction='left_bottom_to_right_top', rotate=90, brightness_increase=100))
 
             # Color(rgb=(0.75, 0.75, 0.75))
-            Color(rgb=(1, 1, 1))
             points = [Pos(450, 450), Pos(450, 1200), Pos(1600, 1200), Pos(1600, 450)]  # "backgroud"
             pos_coords = chain(*[pos.coords() for pos in points])
-            self.rect_four = Quad(points=pos_coords, texture=make_gradient_texture(500, light_direction='left_bottom_to_right_top'))
+            self.rect_four = Quad(points=pos_coords, texture=make_gradient_texture(width=200, light_direction='left_bottom_to_right_top', brightness_increase=105))
+
 
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
@@ -198,7 +198,7 @@ class MyApp(App):
     def build(self):
         self.bind(on_resize=self._update_rect)
 
-        Window.size = (1400, 1000)
+        Window.size = (1400, 600)
         Window.top = 20
         Window.left = 100
         # Window.clearcolor = (0.9, 0.9, 0.9, 0.5)
