@@ -17,13 +17,13 @@ SPACES_X = 6  # two-axis coords
 SPACES_Y = 9
 CUBE_SIZE = 7
 
-BRIGHTNESS_MULTIPLIER = 0.0001  #
+BRIGHTNESS_MULTIPLIER = 0.00015  #
 
 #direct values
 X_OFFSET = 3
 Y_OFFSET = 0
 
-INITIAL_BRIGHTNESS = 0.6
+INITIAL_BRIGHTNESS = 1
 
 cubes_array = []
 for height_level in range(ROW_LENGTH): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
@@ -48,24 +48,24 @@ class MyWidget(Widget):
         self.rect = None
         super(MyWidget, self).__init__(**kwargs)
 
-        # self.sides_color_values = [
-        #     (0.7, 0.7, 0.7),  # right
-        #     (0.6, 0.6, 0.6),  # front
-        #     (1, 1, 1),  # top
-        # ]
+        self.sides_color_values = [
+            (0.7, 0.7, 0.7),  # right
+            (0.6, 0.6, 0.6),  # front
+            (0.6, 0.6, 0.6),  # top
+        ]
 
         from calculations.cube import SIDE
-
-
-        self.sides_color_values = {
-            side: (
-                INITIAL_BRIGHTNESS,
-                INITIAL_BRIGHTNESS,
-                INITIAL_BRIGHTNESS,
-            )
-            for side
-            in Cube.SIDES_DRAWING_ORDER
-        }
+        # #
+        #
+        # self.sides_color_values = {
+        #     side: (
+        #         INITIAL_BRIGHTNESS,
+        #         INITIAL_BRIGHTNESS,
+        #         INITIAL_BRIGHTNESS,
+        #     )
+        #     for side
+        #     in Cube.SIDES_DRAWING_ORDER
+        # }
 
 
         self.sides = []
@@ -75,28 +75,46 @@ class MyWidget(Widget):
                 for row_idx, row in enumerate(reversed(plot), start=2):  # rows from back to front
 
                     for cube_idx, cube in enumerate(reversed(row), start=2):  # cubes from left to right  #
-                        side_shadow_multiplier_map = {
-                            SIDE.TOP: row_idx * cube_idx * plot_idx * plot_idx * plot_idx,#((cube_idx)) * plot_idx * plot_idx * plot_idx * (SPACES_X + SPACES_Y) - plot_idx,
-                            SIDE.FRONT: row_idx * cube_idx * cube_idx * cube_idx,#plot_idx * (cube_idx) * (SPACES_X + SPACES_Y),
-                            SIDE.RIGHT: cube_idx * cube_idx * cube_idx * cube_idx,#plot_idx * (row_idx) * (SPACES_X + SPACES_Y),
-                        }
+
 
 
                         for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
 
 
                             def _colors_update(color_tuple, side_shadow_multiplier):
-                                if side_shadow_multiplier < 1:
-                                    side_shadow_multiplier = 1
+                                color = []
+                                for color_part in color_tuple:
+                                    color.append(color_part * side_shadow_multiplier * BRIGHTNESS_MULTIPLIER)
 
-                                return [color_part * side_shadow_multiplier * BRIGHTNESS_MULTIPLIER for color_part in color_tuple[::]]
+                                    if color[-1] < 0.2:
+                                        color[-1] += 0.1
+
+                                return color
+
+
+                            side_shadow_multiplier_map = {
+                                SIDE.TOP:  ((row_idx + plot_idx) / 2) * plot_idx * plot_idx * plot_idx,
+                                # ((cube_idx)) * plot_idx * plot_idx * plot_idx * (SPACES_X + SPACES_Y) - plot_idx,
+                                SIDE.FRONT: row_idx * (row_idx / 2) * row_idx * row_idx * row_idx,
+                                # plot_idx * (cube_idx) * (SPACES_X + SPACES_Y),
+                                SIDE.RIGHT: ((plot_idx + cube_idx) / 2) * plot_idx * cube_idx * cube_idx,
+                                # plot_idx * (row_idx) * (SPACES_X + SPACES_Y),
+                            }
 
                             side_shadow_multiplier = side_shadow_multiplier_map[side]
-                            # if cube_idx == len(cubes_row) - 1:
-                            #     side_shadow_multiplier =
+
+
+
 
                             color = self.sides_color_values[side]
-                            color_updated = _colors_update(color_tuple=color, side_shadow_multiplier=side_shadow_multiplier)
+                            color_updated = _colors_update(color_tuple=color,
+                                                           side_shadow_multiplier=side_shadow_multiplier)
+
+                            # if row_idx == len(plot) + 1:
+                            #     color_updated = [color * 2 for color in color_updated]
+                            #
+                            # if row_idx == len(plot) + 1 and side == SIDE.FRONT:
+                            #     color_updated = [color * 2 for color in color_updated]
 
                             Color(rgb=color_updated)
                             self.sides.append(cube.sides[side].draw())
