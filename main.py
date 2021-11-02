@@ -10,36 +10,44 @@ from calculations.pos import Pos
 from shadow_texture import make_texture
 
 
-ROW_LENGTH = 6 # should be dividable by 2
+ROW_LENGTH = 4 # should be dividable by 2
+HEIGHT = 1
+DEPTH = 4
 
 # multipliers
-SPACES_X = 6  # two-axis coords
-SPACES_Y = 9
-CUBE_SIZE = 7
+SPACES_X =9 # two-axis coords
 
-BRIGHTNESS_MULTIPLIER = 0.00015  #
+CUBE_SIZE = 13
+
+BRIGHTNESS_MULTIPLIER = 0.1 #
 
 #direct values
 X_OFFSET = 3
 Y_OFFSET = 0
 
-INITIAL_BRIGHTNESS = 1
+SPACES_Y = 7
+
+INITIAL_BRIGHTNESS = .7
 
 cubes_array = []
-for height_level in range(ROW_LENGTH): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
-
+for height_level in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
     cubes_plot = []
-    for row_number in range(ROW_LENGTH):#Y_OFFSET, ROW_LENGTH + Y_OFFSET):
+    for row_number in range(DEPTH):#Y_OFFSET, ROW_LENGTH + Y_OFFSET):
 
         cubes_row = []
-        for cube_number in range(ROW_LENGTH * 2, 0, -2):
+        for real_cube_nuber, cube_number in enumerate(range(ROW_LENGTH * 2, 0, -2)):
             pos = Pos(
-                cube_number * SPACES_X + row_number * SPACES_X + X_OFFSET,
-                row_number * SPACES_X + (5 + height_level * SPACES_Y),
+                x=(cube_number * SPACES_X + row_number * SPACES_X + X_OFFSET),
+                y=(row_number * SPACES_X + (5 + height_level * SPACES_Y)),
             )
-            cubes_row.append(Cube(front_bottom_left=pos, size=CUBE_SIZE))
+            cubes_row.append(Cube(front_bottom_left=pos, size=CUBE_SIZE, resize_back_size=0))
+
+
         cubes_plot.append(cubes_row)
+
+
     cubes_array.append(cubes_plot)
+
 
 
 
@@ -49,14 +57,14 @@ class MyWidget(Widget):
         super(MyWidget, self).__init__(**kwargs)
 
         self.sides_color_values = [
-            (0.7, 0.7, 0.7),  # right
-            (0.6, 0.6, 0.6),  # front
-            (0.6, 0.6, 0.6),  # top
+            (1, 1, 0.999),  # right
+            (1, 0.999, 1),  # front
+            (0.999, 1, 1),  # top
         ]
 
         from calculations.cube import SIDE
-        # #
         #
+
         # self.sides_color_values = {
         #     side: (
         #         INITIAL_BRIGHTNESS,
@@ -76,29 +84,19 @@ class MyWidget(Widget):
 
                     for cube_idx, cube in enumerate(reversed(row), start=2):  # cubes from left to right  #
 
-
-
                         for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
-
 
                             def _colors_update(color_tuple, side_shadow_multiplier):
                                 color = []
                                 for color_part in color_tuple:
                                     color.append(color_part * side_shadow_multiplier * BRIGHTNESS_MULTIPLIER)
 
-                                    if color[-1] < 0.2:
-                                        color[-1] += 0.1
-
                                 return color
 
-
                             side_shadow_multiplier_map = {
-                                SIDE.TOP:  ((row_idx + plot_idx) / 2) * plot_idx * plot_idx * plot_idx,
-                                # ((cube_idx)) * plot_idx * plot_idx * plot_idx * (SPACES_X + SPACES_Y) - plot_idx,
-                                SIDE.FRONT: row_idx * (row_idx / 2) * row_idx * row_idx * row_idx,
-                                # plot_idx * (cube_idx) * (SPACES_X + SPACES_Y),
-                                SIDE.RIGHT: ((plot_idx + cube_idx) / 2) * plot_idx * cube_idx * cube_idx,
-                                # plot_idx * (row_idx) * (SPACES_X + SPACES_Y),
+                                SIDE.TOP:  (plot_idx + plot_idx+ plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 7,
+                                SIDE.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 7,
+                                SIDE.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 7,
                             }
 
                             side_shadow_multiplier = side_shadow_multiplier_map[side]
@@ -110,38 +108,48 @@ class MyWidget(Widget):
                             color_updated = _colors_update(color_tuple=color,
                                                            side_shadow_multiplier=side_shadow_multiplier)
 
-                            # if row_idx == len(plot) + 1:
-                            #     color_updated = [color * 2 for color in color_updated]
-                            #
-                            # if row_idx == len(plot) + 1 and side == SIDE.FRONT:
-                            #     color_updated = [color * 2 for color in color_updated]
 
                             Color(rgb=color_updated)
                             self.sides.append(cube.sides[side].draw())
 
 
 
-
-                    # list(map(self.canvas.remove, self.sides[-row_idx:]))
-
         from kivy.animation import Animation
         from calculations.cube import SIDE
 
-        initial_coord_values = cubes_plot[0][0].sides[SIDE.TOP].get_coords()
 
-        modified_coord_values = [
-            idx + coord * 20
-            if idx % 2
-            else
-            coord * idx
-            for idx, coord
-            in enumerate(initial_coord_values)
-        ]
+    def on_touch_up(self, touch):
+        print(touch)
+        for z in cubes_array:
+            for x in z:
+                for cube in x:
+                    for side in cube.sides.values():
+                        touch_x = touch.pos[0]
+                        touch_y = touch.pos[1]
 
-        anim = Animation(points=modified_coord_values, duration=3)
-        # anim.start(self.sides[-22])
-        # anim.start(self.sides[-5])
-        # anim.start(self.sides[-30])
+                        if touch_x > side.corners[0].x * CUBE_SIZE and touch_y > side.corners[0].y * CUBE_SIZE:
+                            print('1')
+                            if touch_x < side.corners[2].x * CUBE_SIZE and touch_y < side.corners[2].y * CUBE_SIZE:
+                                print('2')
+
+                                print('Found cube!')
+
+                                initial_coord_values = cube.sides[SIDE.TOP].get_coords()
+
+                                modified_coord_values = [
+                                    idx + coord * 20
+                                    if idx % 2
+                                    else
+                                    coord * idx
+                                    for idx, coord
+                                    in enumerate(initial_coord_values)
+                                ]
+                                from kivy.animation import Animation
+                                anim = Animation(points=modified_coord_values, duration=3)
+                                anim.start(self.sides[-1])
+
+
+
 
 
 class RootWidgetBoxLayout(FloatLayout):

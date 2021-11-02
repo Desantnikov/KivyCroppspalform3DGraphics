@@ -41,10 +41,11 @@ class CubeSide:
 
 
 class Cube:
-    SIDES_DRAWING_ORDER = [SIDE.RIGHT, SIDE.FRONT, SIDE.TOP]
+    SIDES_DRAWING_ORDER = [SIDE.TOP, SIDE.RIGHT, SIDE.FRONT, ]
 
-    def __init__(self, front_bottom_left: Pos, size: int):  #, front_bottom_left: Pos, front_top_left: Pos, front_top_right: Pos, front_bottom_right: Pos):
+    def __init__(self, front_bottom_left: Pos, size: int, resize_back_size = 0):  #, front_bottom_left: Pos, front_top_left: Pos, front_top_right: Pos, front_bottom_right: Pos):
         self.size = size
+        self.resize_back_side = resize_back_size
 
         self.sides = {}
         self.sides[SIDE.FRONT] = self._calc_front_side(front_bottom_left)  # Calculation order is important
@@ -81,6 +82,12 @@ class Cube:
                 for corner in self.sides[SIDE.FRONT].corners
             ),
         )
+
+
+        # back_side.corners[-3].y += self.resize_back_side
+        # back_side.corners[-2].y += self.resize_back_side
+        # back_side.corners[-2].x += self.resize_back_side
+        # back_side.corners[-1].x += self.resize_back_side
 
         return back_side
 
