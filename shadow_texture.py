@@ -3,21 +3,32 @@ from PIL import Image, ImageFilter, ImageDraw
 
 RAD_MULT = 0.25
 
-def make_texture(width):
+def make_gradient_texture(width, light_direction, rotate=None):
     gradient = Image.new('RGBA', (width, width), color=(1))
     draw = ImageDraw.Draw(gradient, mode='RGBA')
 
     for x in range(width):
         for y in range(width):
-            start, end = (x, y), (x, y)
-            draw.line([start, end],  (255, 255, 255, x), width=1)
+            if light_direction == 'downside':
+                start, end = (x, y), (x, y)
+            elif light_direction == 'left_to_right':
+                start, end = (x, x), (y, x)
+            elif light_direction == 'left_bottom_to_right_top':
+                start, end = (x, y), (y, x)
+            else:
+                raise Exception('wrong directon')
 
-    from PIL.Image import BILINEAR, BOX, BICUBIC
-    # gradient = gradient.rotate(angle=41, resample=BICUBIC,expand=True, translate=(95, 50))
-    # gradient = gradient.effect_spread(distance=10)
+            draw.line([start, end],  (255, 255, 255, int((x+y)/2)), width=1)
 
-    # for line in range(width):
-    #     draw.line([(line, line), (width, width)], (1,1,1,line), width=1)
+
+    # if light_direction == 'right_bottom_to_left_top':
+    #     gradient = gradient.rotate(90)
+    # if light_direction == 'right_top_to_left_bottom':
+    #     gradient = gradient.rotate(90)
+
+    if rotate is not None:
+        gradient = gradient.rotate(rotate)
+
     buf = bytes(gradient.tobytes())
 
     texture = Texture.create(size=(width, width), bufferfmt='ubyte')
