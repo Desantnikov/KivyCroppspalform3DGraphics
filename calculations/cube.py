@@ -27,10 +27,7 @@ class CubeSide:
     def __init__(self, side,  corners):
         self.corners = corners
         self.side = side
-
-        self.drawed = None
-
-
+        self.drawn = None
 
     def get_edge_length(self):
         assert self.side in [SIDE.FRONT, SIDE.BACK], 'Only front and back sides are 100% valid for this'
@@ -44,10 +41,10 @@ class CubeSide:
         return coords
 
     def draw(self, texture=None):
-
+        assert self.drawn is None, 'Trying to draw already drawn figure'
 
         quad = Quad(points=map(CubeSide.ratio_func, self.get_coords()), texture=texture)
-        self.drawed = quad
+        self.drawn = quad
         return quad
 
 
@@ -93,7 +90,6 @@ class Cube:
                 for corner in self.sides[SIDE.FRONT].corners
             ),
         )
-
 
         # back_side.corners[-3].y += self.resize_back_side
         # back_side.corners[-2].y += self.resize_back_side

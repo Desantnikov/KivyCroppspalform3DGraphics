@@ -11,7 +11,7 @@ from shadow_texture import make_gradient_texture
 
 
 ROW_LENGTH = 4 # should be dividable by 2
-HEIGHT = 3
+HEIGHT = 1
 DEPTH = 4
 
 # multipliers
@@ -30,7 +30,7 @@ SPACES_Y = 15
 INITIAL_BRIGHTNESS = .7
 
 cubes_array = []
-for height_level in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
+for plot_number in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
     cubes_plot = []
     for row_number in range(DEPTH):#Y_OFFSET, ROW_LENGTH + Y_OFFSET):
 
@@ -38,7 +38,7 @@ for height_level in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
         for real_cube_nuber, cube_number in enumerate(range(ROW_LENGTH * 2, 0, -2)):
             pos = Pos(
                 x=(cube_number * SPACES_X + row_number * SPACES_X + X_OFFSET),
-                y=(row_number * SPACES_X + (5 + height_level * SPACES_Y)) + Y_OFFSET,
+                y=(row_number * SPACES_X + (5 + plot_number * SPACES_Y)) + Y_OFFSET,
             )
             cubes_row.append(Cube(front_bottom_left=pos, size=CUBE_SIZE, resize_back_size=0))
 
@@ -95,7 +95,7 @@ class MyWidget(Widget):
                                 return color
 
                             side_shadow_multiplier_map = {
-                                SIDE.TOP:  (plot_idx + plot_idx+ plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 7,
+                                SIDE.TOP:  (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 7,
                                 SIDE.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 7,
                                 SIDE.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 7,
                             }
@@ -116,7 +116,7 @@ class MyWidget(Widget):
             for x in reversed(z):
                 for cube in reversed(x):
                     for side in cube.sides.values():
-                        if not side.drawed:
+                        if not side.drawn:
                             continue
 
                         touch_x = touch.pos[0]
@@ -129,10 +129,10 @@ class MyWidget(Widget):
                                 initial_coord_values = side.get_coords(after_ratio=True)
 
                                 modified_coord_values = [
-                                    coord - 25
+                                    coord - 15
                                     if idx in [0, 1, 2, 7] else
 
-                                    coord + 25
+                                    coord + 15
 
                                     for idx, coord
                                     in enumerate(initial_coord_values)
@@ -142,10 +142,10 @@ class MyWidget(Widget):
                                 from calculations.cube import SIDE
 
                                 from kivy.animation import Animation
-                                anim = Animation(points=modified_coord_values, duration=0.7, transition='out_elastic')
+                                anim = Animation(points=modified_coord_values, duration=0.4, transition='out_back')
 
-                                anim += Animation(points=initial_coord_values, duration=0.3, transition='in_back')
-                                anim.start(side.drawed)
+                                anim += Animation(points=initial_coord_values, duration=0.4, transition='in_back')
+                                anim.start(side.drawn)
 
                                 return
 
