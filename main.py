@@ -5,9 +5,9 @@ from kivy.core.window import Window
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 
-from classes.cube import Cube
+from geometry.cube import Cube
 from enums import SIDE
-from classes.pos import Pos
+from geometry.pos import Pos
 from shadow_texture import make_gradient_texture
 
 
@@ -59,12 +59,11 @@ class MyWidget(Widget):
 
         self.sides_color_values = [
             (0.6, 0.6, 0.6),  # front
-
-             (0.80, 0.80, 0.80),  # top
+            (0.80, 0.80, 0.80),  # top
             (0.95, 0.95, 0.95),  # right
         ]
 
-        from classes.cube import SIDE
+        from geometry.cube import SIDE
         #
 
         # self.sides_color_values = {
@@ -86,7 +85,7 @@ class MyWidget(Widget):
 
                     for cube_idx, cube in enumerate(reversed(row), start=2):  # cubes from left to right  #
 
-                        for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):
+                        for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):  # cube sides
 
                             def _colors_update(color_tuple, side_shadow_multiplier):
                                 color = []
@@ -140,7 +139,7 @@ class MyWidget(Widget):
                                 ]
 
                                 from kivy.animation import Animation, AnimationTransition
-                                from classes.cube import SIDE
+                                from geometry.cube import SIDE
 
                                 from kivy.animation import Animation
                                 anim = Animation(points=modified_coord_values, duration=0.4, transition='out_back')
@@ -155,32 +154,32 @@ class RootWidgetBoxLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(RootWidgetBoxLayout, self).__init__(**kwargs)
 
+        # placeholders for Quads
+        self.floor = None  
+        self.left_wall = None
+        self.back_wall = None
+        
         self.bind(on_resize=self._update_rect)
         self.draw_background()
 
         my_widget = MyWidget(size=(1200, 1200))
         self.add_widget(my_widget)
-
+        
     def draw_background(self):
         with self.canvas.before:
-            Color(rgb=(1,1,1))
+            Color(rgb=(1, 1, 1))
 
-            points = [Pos(10, 10), Pos(450, 450), Pos(1600, 450), Pos(1600, 10)]  # "floor"
-            pos_coords = chain(*[pos.coords() for pos in points])
+            # floor drawing
+            floor_texture = make_gradient_texture(150, 'left_bottom_to_right_top', 75, -90)
+            self.floor = Quad(points=[10, 10, 450, 450, 1600, 450, 1600, 10], texture=floor_texture)
 
-            self.rect_two = Quad(points=pos_coords, texture=make_gradient_texture(width=150, light_direction='left_bottom_to_right_top', brightness_increase=75, rotate=-90))
+            # left wall drawing
+            left_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 100, 90)
+            self.left_wall = Quad(points=[10, 10, 10, 1200, 450, 1200, 450, 450], texture=left_wall_texture)
 
-
-
-            points = [Pos(10, 10), Pos(10, 1200), Pos(450, 1200), Pos(450, 450)]  # "left wall"
-            pos_coords = chain(*[pos.coords() for pos in points])
-            self.rect_three = Quad(points=pos_coords, texture=make_gradient_texture(width=200, light_direction='left_bottom_to_right_top', rotate=90, brightness_increase=100))
-
-            # Color(rgb=(0.75, 0.75, 0.75))
-            points = [Pos(450, 450), Pos(450, 1600), Pos(1600, 1600), Pos(1600, 450)]  # "backgroud"
-            pos_coords = chain(*[pos.coords() for pos in points])
-            self.rect_four = Quad(points=pos_coords, texture=make_gradient_texture(width=200, light_direction='left_bottom_to_right_top', brightness_increase=105))
-
+            # back wall drawing
+            back_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 105)
+            self.back_wall = Quad(points=[450, 450, 450, 1600, 1600, 1600, 1600, 450], texture=back_wall_texture)
 
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos

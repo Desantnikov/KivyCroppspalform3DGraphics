@@ -1,7 +1,7 @@
 from typing import Dict
 
-from classes.cube_side import CubeSide
-from classes.pos import Pos
+from geometry.cube_side import CubeSide
+from geometry.pos import Pos
 from enums import SIDE, CORNER
 
 

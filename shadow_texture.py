@@ -3,7 +3,7 @@ from PIL import Image, ImageFilter, ImageDraw
 
 RAD_MULT = 0.25
 
-def make_gradient_texture(width=500, height=None, light_direction='left_to_right', rotate=None, brightness_increase=None):
+def make_gradient_texture(width=500, light_direction='left_to_right', brightness_increase=None, rotate=None, height=None):
     if height is None:
         height = width
 
