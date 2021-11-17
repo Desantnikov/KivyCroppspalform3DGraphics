@@ -1,15 +1,13 @@
-from itertools import chain
-
 from kivy.app import App, Widget
 from kivy.core.window import Window
-from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
+from kivy.graphics.context_instructions import Color
+from kivy.graphics.vertex_instructions import Quad
+from kivy.uix.floatlayout import FloatLayout
 
 from geometry.cube import Cube
-from enums import SIDE
 from geometry.pos import Pos
 from shadow_texture import make_gradient_texture
-
 
 ROW_LENGTH = 4 # should be dividable by 2
 HEIGHT = 1
@@ -138,7 +136,6 @@ class MyWidget(Widget):
                                     in enumerate(initial_coord_values)
                                 ]
 
-                                from kivy.animation import Animation, AnimationTransition
                                 from geometry.cube import SIDE
 
                                 from kivy.animation import Animation
@@ -147,46 +144,32 @@ class MyWidget(Widget):
                                 anim += Animation(points=initial_coord_values, duration=0.4, transition='in_back')
                                 anim.start(side.drawn)
 
-                                return
-
 
 class RootWidgetBoxLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(RootWidgetBoxLayout, self).__init__(**kwargs)
 
-        # placeholders for Quads
-        self.floor = None  
-        self.left_wall = None
-        self.back_wall = None
-        
-        self.bind(on_resize=self._update_rect)
-        self.draw_background()
+        # placeholders for Quad objects
+        self.floor = self.left_wall = self.back_wall = None
 
-        my_widget = MyWidget(size=(1200, 1200))
-        self.add_widget(my_widget)
-        
-    def draw_background(self):
+        self.add_widget(MyWidget(size=(1200, 1200)))
         with self.canvas.before:
-            Color(rgb=(1, 1, 1))
+            self._draw_background()
 
-            # floor drawing
-            floor_texture = make_gradient_texture(150, 'left_bottom_to_right_top', 75, -90)
-            self.floor = Quad(points=[10, 10, 450, 450, 1600, 450, 1600, 10], texture=floor_texture)
+    def _draw_background(self):
+        Color(rgb=(1, 1, 1))
 
-            # left wall drawing
-            left_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 100, 90)
-            self.left_wall = Quad(points=[10, 10, 10, 1200, 450, 1200, 450, 450], texture=left_wall_texture)
+        floor_texture = make_gradient_texture(150, 'left_bottom_to_right_top', 75, -90)
+        self.floor = Quad(points=[10, 10, 450, 450, 1600, 450, 1600, 10], texture=floor_texture)
 
-            # back wall drawing
-            back_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 105)
-            self.back_wall = Quad(points=[450, 450, 450, 1600, 1600, 1600, 1600, 450], texture=back_wall_texture)
+        left_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 100, 90)
+        self.left_wall = Quad(points=[10, 10, 10, 1200, 450, 1200, 450, 450], texture=left_wall_texture)
 
-    def _update_rect(self, instance, value):
-        self.rect.pos = instance.pos
-        self.rect.size = instance.size
+        back_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 105)
+        self.back_wall = Quad(points=[450, 450, 450, 1600, 1600, 1600, 1600, 450], texture=back_wall_texture)
 
 
-class MyApp(App):
+class MainApp(App):
     def build(self):
         self.bind(on_resize=self._update_rect)
 
@@ -206,4 +189,6 @@ class MyApp(App):
 
 
 if __name__ == '__main__':
-    MyApp().run()
+    MainApp().run()
+
+
