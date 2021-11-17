@@ -5,8 +5,9 @@ from kivy.core.window import Window
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import *
 
-from calculations.cube import Cube, SIDE
-from calculations.pos import Pos
+from classes.cube import Cube
+from enums import SIDE
+from classes.pos import Pos
 from shadow_texture import make_gradient_texture
 
 
@@ -40,7 +41,7 @@ for plot_number in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
                 x=(cube_number * SPACES_X + row_number * SPACES_X + X_OFFSET),
                 y=(row_number * SPACES_X + (5 + plot_number * SPACES_Y)) + Y_OFFSET,
             )
-            cubes_row.append(Cube(front_bottom_left=pos, size=CUBE_SIZE, resize_back_size=0))
+            cubes_row.append(Cube(front_side_bottom_left_corner_pos=pos, size=CUBE_SIZE))
 
 
         cubes_plot.append(cubes_row)
@@ -63,7 +64,7 @@ class MyWidget(Widget):
             (0.95, 0.95, 0.95),  # right
         ]
 
-        from calculations.cube import SIDE
+        from classes.cube import SIDE
         #
 
         # self.sides_color_values = {
@@ -126,7 +127,7 @@ class MyWidget(Widget):
                             if touch_x < side.corners[2].x * 10 and touch_y < side.corners[2].y * 10:
 
 
-                                initial_coord_values = side.get_coords(after_ratio=True)
+                                initial_coord_values = side.get_coords()
 
                                 modified_coord_values = [
                                     coord - 15
@@ -139,7 +140,7 @@ class MyWidget(Widget):
                                 ]
 
                                 from kivy.animation import Animation, AnimationTransition
-                                from calculations.cube import SIDE
+                                from classes.cube import SIDE
 
                                 from kivy.animation import Animation
                                 anim = Animation(points=modified_coord_values, duration=0.4, transition='out_back')
