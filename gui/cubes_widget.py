@@ -1,16 +1,13 @@
 from typing import List
 
-from kivy.app import App, Widget
-from kivy.core.window import Window
 from kivy.animation import Animation
 from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Quad
-from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.widget import Widget
 
-from geometry.cube.enums import SIDE
 from geometry.cube.cube import Cube
 from geometry.pos import Pos
-from helpers import make_gradient_texture
+from geometry.cube.enums import SIDE
+
 
 CUBE_SIDES_COLOR_VALUES = [
     (0.6, 0.6, 0.6),  # front
@@ -18,20 +15,18 @@ CUBE_SIDES_COLOR_VALUES = [
     (0.95, 0.95, 0.95),  # right
 ]
 
-
-
-ROW_LENGTH = 4 # should be dividable by 2
+ROW_LENGTH = 4  # should be dividable by 2
 HEIGHT = 1
 DEPTH = 4
 
 # multipliers
-SPACES_X = 9 # two-axis coords
+SPACES_X = 9  # two-axis coords
 
 CUBE_SIZE = 10
 
-BRIGHTNESS_MULTIPLIER = 0.15 #
+BRIGHTNESS_MULTIPLIER = 0.15  #
 
-#direct values
+# direct values
 X_OFFSET = 3
 Y_OFFSET = 2
 
@@ -40,9 +35,9 @@ SPACES_Y = 15
 INITIAL_BRIGHTNESS = .7
 
 cubes_array = []
-for plot_number in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
+for plot_number in range(HEIGHT):  # Y_OFFSET, ROW_LENGTH + Y_OFFSET):
     cubes_plot = []
-    for row_number in range(DEPTH):#Y_OFFSET, ROW_LENGTH + Y_OFFSET):
+    for row_number in range(DEPTH):  # Y_OFFSET, ROW_LENGTH + Y_OFFSET):
 
         cubes_row = []
         for real_cube_nuber, cube_number in enumerate(range(ROW_LENGTH * 2, 0, -2)):
@@ -52,18 +47,14 @@ for plot_number in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
             )
             cubes_row.append(Cube(front_side_bottom_left_corner_pos=pos, size=CUBE_SIZE))
 
-
         cubes_plot.append(cubes_row)
-
 
     cubes_array.append(cubes_plot)
 
 
-
-
-class MyWidget(Widget):
+class CubesWidget(Widget):
     def __init__(self, **kwargs):
-        super(MyWidget, self).__init__(**kwargs)
+        super(CubesWidget, self).__init__(**kwargs)
 
         self.rect = None
         self.sides = []
@@ -139,54 +130,3 @@ class MyWidget(Widget):
         recalculated_color = [color_part * overall_multiplier for color_part in side_initial_color]
 
         return recalculated_color
-
-
-
-
-class RootWidgetBoxLayout(FloatLayout):
-    def __init__(self, **kwargs):
-        super(RootWidgetBoxLayout, self).__init__(**kwargs)
-
-        # placeholders for Quad objects
-        self.floor = self.left_wall = self.back_wall = None
-
-        self.add_widget(MyWidget(size=(1200, 1200)))
-        with self.canvas.before:
-            self._draw_background()
-
-    def _draw_background(self):
-        Color(rgb=(1, 1, 1))
-
-        floor_texture = make_gradient_texture(150, 'left_bottom_to_right_top', 75, -90)
-        self.floor = Quad(points=[10, 10, 450, 450, 1600, 450, 1600, 10], texture=floor_texture)
-
-        left_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 100, 90)
-        self.left_wall = Quad(points=[10, 10, 10, 1200, 450, 1200, 450, 450], texture=left_wall_texture)
-
-        back_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 105)
-        self.back_wall = Quad(points=[450, 450, 450, 1600, 1600, 1600, 1600, 450], texture=back_wall_texture)
-
-
-class MainApp(App):
-    def build(self):
-        self.bind(on_resize=self._update_rect)
-
-        Window.size = (1400, 1000)
-        Window.top = 40
-        Window.left = 100
-        # Window.clearcolor = (0.9, 0.9, 0.9)
-
-        self.root = root = RootWidgetBoxLayout()
-
-        return root
-
-    def _update_rect(self, instance, value):
-        self.top = instance.top
-        self.left = instance.left
-        self.size = instance.size
-
-
-if __name__ == '__main__':
-    MainApp().run()
-
-
