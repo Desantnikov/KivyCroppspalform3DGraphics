@@ -4,7 +4,7 @@ from operator import imul
 from kivy.graphics.vertex_instructions import Quad
 
 from helpers import make_flat
-from enums import SIDE
+from geometry.cube.enums import SIDE
 
 
 class CubeSide:
