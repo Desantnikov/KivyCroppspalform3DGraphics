@@ -1,13 +1,26 @@
+from typing import List, Tuple
+
 from kivy.app import App, Widget
 from kivy.core.window import Window
 from kivy.graphics import *
+from kivy.animation import Animation
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Quad
 from kivy.uix.floatlayout import FloatLayout
 
+from enums import SIDE
 from geometry.cube import Cube
 from geometry.pos import Pos
 from shadow_texture import make_gradient_texture
+
+
+CUBE_SIDES_COLOR_VALUES = [
+    (0.6, 0.6, 0.6),  # front
+    (0.80, 0.80, 0.80),  # top
+    (0.95, 0.95, 0.95),  # right
+]
+
+
 
 ROW_LENGTH = 4 # should be dividable by 2
 HEIGHT = 1
@@ -52,61 +65,13 @@ for plot_number in range(HEIGHT): #Y_OFFSET, ROW_LENGTH + Y_OFFSET):
 
 class MyWidget(Widget):
     def __init__(self, **kwargs):
-        self.rect = None
         super(MyWidget, self).__init__(**kwargs)
 
-        self.sides_color_values = [
-            (0.6, 0.6, 0.6),  # front
-            (0.80, 0.80, 0.80),  # top
-            (0.95, 0.95, 0.95),  # right
-        ]
-
-        from geometry.cube import SIDE
-        #
-
-        # self.sides_color_values = {
-        #     side: (
-        #         INITIAL_BRIGHTNESS,
-        #         INITIAL_BRIGHTNESS,
-        #         INITIAL_BRIGHTNESS,
-        #     )
-        #     for side
-        #     in Cube.SIDES_DRAWING_ORDER
-        # }
-
-
+        self.rect = None
         self.sides = []
+
         with self.canvas:
-            for plot_idx, plot in enumerate(cubes_array, start=2):  # height (z)
-
-                for row_idx, row in enumerate(reversed(plot), start=2):  # rows from back to front
-
-                    for cube_idx, cube in enumerate(reversed(row), start=2):  # cubes from left to right  #
-
-                        for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):  # cube sides
-
-                            def _colors_update(color_tuple, side_shadow_multiplier):
-                                color = []
-                                for color_part in color_tuple:
-                                    color.append(color_part * side_shadow_multiplier * BRIGHTNESS_MULTIPLIER)
-
-                                return color
-
-                            side_shadow_multiplier_map = {
-                                SIDE.TOP:  (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 7,
-                                SIDE.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 7,
-                                SIDE.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 7,
-                            }
-
-                            side_shadow_multiplier = side_shadow_multiplier_map[side]
-
-                            color = self.sides_color_values[side]
-                            color_updated = _colors_update(color_tuple=color, side_shadow_multiplier=side_shadow_multiplier)
-
-
-                            Color(rgb=color_updated)
-                            cube.sides[side].draw()
-
+            self._draw_cubes()
 
     def on_touch_up(self, touch):
         print(touch)
@@ -123,26 +88,61 @@ class MyWidget(Widget):
                         if touch_x > side.corners[0].x * 10 and touch_y > side.corners[0].y * 10:
                             if touch_x < side.corners[2].x * 10 and touch_y < side.corners[2].y * 10:
 
-
                                 initial_coord_values = side.get_coords()
 
                                 modified_coord_values = [
                                     coord - 15
-                                    if idx in [0, 1, 2, 7] else
-
-                                    coord + 15
-
-                                    for idx, coord
-                                    in enumerate(initial_coord_values)
+                                    if idx in [0, 1, 2, 7]
+                                    else coord + 15
+                                    for idx, coord in enumerate(initial_coord_values)
                                 ]
 
-                                from geometry.cube import SIDE
-
-                                from kivy.animation import Animation
                                 anim = Animation(points=modified_coord_values, duration=0.4, transition='out_back')
 
                                 anim += Animation(points=initial_coord_values, duration=0.4, transition='in_back')
                                 anim.start(side.drawn)
+
+    def _draw_cubes(self):
+        for plot_idx, plot in enumerate(cubes_array, start=2):  # height (z)
+
+            for row_idx, row in enumerate(reversed(plot), start=2):  # rows from back to front
+
+                for cube_idx, cube in enumerate(reversed(row), start=2):  # cubes from left to right  #
+
+                    for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):  # cube sides
+
+                        shadow_multiplier = self._get_side_shadow_multiplier(side, plot_idx, row_idx, cube_idx)
+                        color_with_shadow = self._adjust_color_brightness(side, shadow_multiplier)
+
+                        Color(rgb=color_with_shadow)
+
+                        cube.sides[side].draw()
+
+    @staticmethod
+    def _get_side_shadow_multiplier(side, plot_idx, row_idx, cube_idx):
+        side_shadow_multiplier_map = {
+            SIDE.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 7,
+            SIDE.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 7,
+            SIDE.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 7,
+        }
+
+        return side_shadow_multiplier_map[side]
+
+    @staticmethod
+    def _adjust_color_brightness(side, shadow_multiplier: float) -> List[float]:
+        """
+            used to adjust brightness according to shadow miltiplier, which is calculated
+            basing on current cube's position and current side
+        """
+
+        side_initial_color = CUBE_SIDES_COLOR_VALUES[side]
+
+        overall_multiplier = shadow_multiplier * BRIGHTNESS_MULTIPLIER
+        recalculated_color = [color_part * overall_multiplier for color_part in side_initial_color]
+
+        return recalculated_color
+
+
 
 
 class RootWidgetBoxLayout(FloatLayout):
