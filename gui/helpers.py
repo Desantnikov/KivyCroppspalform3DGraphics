@@ -2,15 +2,6 @@ from PIL import Image, ImageDraw
 from kivy.graphics.texture import Texture
 
 
-def make_flat(input_list):
-    return_list = []
-
-    for value in input_list:
-        return_list.extend(value)
-
-    return return_list
-
-
 def make_gradient_texture(width=500, light_direction='left_to_right', brightness_increase=None, rotate=None, height=None):
     if height is None:
         height = width

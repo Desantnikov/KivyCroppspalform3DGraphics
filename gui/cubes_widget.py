@@ -4,62 +4,17 @@ from kivy.animation import Animation
 from kivy.graphics.context_instructions import Color
 from kivy.uix.widget import Widget
 
-from geometry.cube.cube import Cube
-from geometry.pos import Pos
+from geometry.constants import SPACES_Y, SPACES_X
+from geometry.cube_from_cubes import CubeFromCubes
 from geometry.cube.enums import SIDE
-
-
-CUBE_SIDES_COLOR_VALUES = [
-    (0.6, 0.6, 0.6),  # front
-    (0.80, 0.80, 0.80),  # top
-    (0.95, 0.95, 0.95),  # right
-]
-
-ROW_LENGTH = 4  # should be dividable by 2
-HEIGHT = 1
-DEPTH = 4
-
-# multipliers
-SPACES_X = 9  # two-axis coords
-
-CUBE_SIZE = 10
-
-BRIGHTNESS_MULTIPLIER = 0.15  #
-
-# direct values
-X_OFFSET = 3
-Y_OFFSET = 2
-
-SPACES_Y = 15
-
-INITIAL_BRIGHTNESS = .7
-
-
-def create_cubes_array():
-    cubes_array = []
-    for plot_number in range(HEIGHT):  # Y_OFFSET, ROW_LENGTH + Y_OFFSET):
-        cubes_plot = []
-        for row_number in range(DEPTH):  # Y_OFFSET, ROW_LENGTH + Y_OFFSET):
-
-            cubes_row = []
-            for real_cube_nuber, cube_number in enumerate(range(ROW_LENGTH * 2, 0, -2)):
-                pos = Pos(
-                    x=(cube_number * SPACES_X + row_number * SPACES_X + X_OFFSET),
-                    y=(row_number * SPACES_X + (5 + plot_number * SPACES_Y)) + Y_OFFSET,
-                )
-                cubes_row.append(Cube(front_side_bottom_left_corner_pos=pos, size=CUBE_SIZE))
-
-            cubes_plot.append(cubes_row)
-
-        cubes_array.append(cubes_plot)
-    return cubes_array
+from gui.constants import CUBE_SIDES_COLOR_VALUES, BRIGHTNESS_MULTIPLIER
 
 
 class CubesWidget(Widget):
     def __init__(self, **kwargs):
         super(CubesWidget, self).__init__(**kwargs)
 
-        self.cubes_array = create_cubes_array()
+        self.cube_from_cubes = CubeFromCubes()
         self.sides = []
 
         with self.canvas:
@@ -67,7 +22,7 @@ class CubesWidget(Widget):
 
     def on_touch_up(self, touch):
         print(touch)
-        for z in reversed(self.cubes_array):
+        for z in reversed(self.cube_from_cubes.array):
             for x in reversed(z):
                 for cube in reversed(x):
                     for side in cube.sides.values():
@@ -95,7 +50,7 @@ class CubesWidget(Widget):
                                 anim.start(side.drawn)
 
     def _draw_cubes(self):
-        for plot_idx, plot in enumerate(self.cubes_array, start=2):  # height (z)
+        for plot_idx, plot in enumerate(self.cube_from_cubes.array, start=2):  # height (z)
 
             for row_idx, row in enumerate(reversed(plot), start=2):  # rows from back to front
 

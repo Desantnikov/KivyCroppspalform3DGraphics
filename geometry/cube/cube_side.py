@@ -3,7 +3,7 @@ from operator import imul
 
 from kivy.graphics.vertex_instructions import Quad
 
-from helpers import make_flat
+from geometry.helpers import make_flat
 from geometry.cube.enums import SIDE
 
 
