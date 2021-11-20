@@ -20,6 +20,10 @@ class Cube:
         self.sides[SIDE.TOP] = self._calc_top_side()
         self.sides[SIDE.RIGHT] = self._calc_right_side()
 
+    @property
+    def drawn_sides(self):
+        return list(filter(lambda side: side.drawn, self.sides.values()))
+
     def _calc_front_side(self) -> CubeSide:
         front_side_corners_pos_dict = self._calc_square_corners_pos_dict(self.front_side_bottom_left_corner_pos, self.size)
 

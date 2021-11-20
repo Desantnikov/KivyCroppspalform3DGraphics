@@ -1,47 +1,59 @@
+from typing import List, Tuple
 from functools import partial
 from operator import imul
 
 from kivy.graphics.vertex_instructions import Quad
+from kivy.animation import Animation
 
 from geometry.helpers import make_flat
 from geometry.cube.enums import SIDE
+from geometry.constants import CUBE_SIZE
 
 
 class CubeSide:
     DRAWING_RATIO = 10
 
-    def __init__(self, side,  corners):
+    def __init__(self, side: SIDE,  corners):
         self.corners = corners
         self.side = side
         self.drawn = None
 
-        self.multiply_by_ratio = partial(imul, self.DRAWING_RATIO)
-
-    def get_edge_length(self):
-        assert self.side in [SIDE.FRONT, SIDE.BACK], 'Only front and back sides are 100% valid for this'
-        return self.corners[1].y - self.corners[0].y
-
-    def get_coords(self, multiplied_by_ratio=True, flatten=True):
-        coords = [
-            corner.coords() if not multiplied_by_ratio
-            else map(self.multiply_by_ratio, corner.coords())
-            for corner
-            in self.corners
-        ]
-
-        # if True - return list with 8 elements
-        # otherwise returns list with 4 tuples each having 2 int elemt
-        if flatten:
-            coords = make_flat(coords)
-
-        return coords
-
     def draw(self, texture=None):
         assert self.drawn is None, 'Trying to draw already drawn figure'
 
-        self.drawn = Quad(
-            points=self.get_coords(),
-            texture=texture,
-        )
+        self.drawn = Quad(points=self.get_coords(), texture=texture)
 
         return self.drawn
+
+    def is_pos_inside(self, pos):
+        if pos.x > self.corners[0].x * CUBE_SIZE and pos.y > self.corners[0].y * CUBE_SIZE:
+            if pos.x < self.corners[2].x * CUBE_SIZE and pos.y < self.corners[2].y * CUBE_SIZE:
+                return True
+
+        return False
+
+    def transform(self):
+        # transform touched side
+        initial_coord_values = self.get_coords()
+
+        modified_coord_values = [
+            coord - 15
+            if idx in [0, 1, 2, 7]
+            else coord + 15
+            for idx, coord in enumerate(initial_coord_values)
+        ]
+
+        anim = Animation(points=modified_coord_values, duration=0.4, transition='out_back')
+
+        anim += Animation(points=initial_coord_values, duration=0.4, transition='in_back')
+        anim.start(self.drawn)
+
+    def get_coords(self) -> List[int]:
+        """
+            make list of coords tuples ---------> [(x1, y1), (x2, y2), ...]
+            make it flat -----------------------> [x1, y1, x2, y2, ...]
+            multiply each element by ratio -----> [x1 * RATIO, y1 * RATIO, x2 * RATIO, y2 * RATIO, ...]
+            return
+        """
+
+        return list(map(partial(imul, self.DRAWING_RATIO),  make_flat([corner.coords() for corner in self.corners])))
