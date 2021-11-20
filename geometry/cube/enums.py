@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 
-class SIDE(IntEnum):
+class SIDES(IntEnum):
     FRONT = 0
     TOP = 1
     RIGHT = 2
@@ -10,7 +10,7 @@ class SIDE(IntEnum):
     BACK = 5
 
 
-class CORNER(IntEnum):
+class CORNERS(IntEnum):
     LEFT_BOTTOM = 0
     LEFT_TOP = 1
     RIGHT_TOP = 2

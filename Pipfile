@@ -11,6 +11,7 @@ setuptools = "*"
 "kivy.deps.gstreamer" = "*"
 kivy-examples = "*"
 pillow = "*"
+shapely = "*"
 
 [dev-packages]
 

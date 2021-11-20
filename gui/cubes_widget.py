@@ -5,8 +5,8 @@ from kivy.uix.widget import Widget
 
 from geometry.constants import SPACES_Y, SPACES_X
 from geometry.cube_from_cubes import CubeFromCubes
-from geometry.cube.enums import SIDE
-from geometry.pos import Pos
+from geometry.cube.enums import SIDES
+from geometry.point import Point
 from gui.constants import CUBE_SIDES_COLOR_VALUES, BRIGHTNESS_MULTIPLIER
 
 
@@ -21,16 +21,15 @@ class CubesWidget(Widget):
             self._draw_cubes()
 
     def on_touch_up(self, touch):
-        touch_pos = Pos(*touch.pos)
-        print(f'Touch: {touch_pos}')
+        touch_point = Point(*touch.pos)
 
         for plot in reversed(self.cube_from_cubes.array):
-            for row in reversed(plot):
+            for row in plot:
                 for cube in reversed(row):
-                    for side in reversed(cube.drawn_sides):
+                    for cube_side in reversed(cube.drawn_sides):
 
-                        if side.is_pos_inside(pos=touch_pos):
-                            side.transform()
+                        if touch_point in cube_side:
+                            cube_side.transform()
                             return
 
     def _draw_cubes(self):
@@ -49,9 +48,9 @@ class CubesWidget(Widget):
     @staticmethod
     def _get_side_shadow_multiplier(side, plot_idx, row_idx, cube_idx):
         side_shadow_multiplier_map = {
-            SIDE.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 7,
-            SIDE.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 7,
-            SIDE.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 7,
+            SIDES.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 7,
+            SIDES.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 7,
+            SIDES.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 7,
         }
 
         return side_shadow_multiplier_map[side]

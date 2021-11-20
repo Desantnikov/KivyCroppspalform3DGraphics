@@ -1,4 +1,4 @@
-from geometry.pos import Pos
+from geometry.point import Point
 from geometry.cube.cube import Cube
 
 from geometry.constants import (
@@ -45,10 +45,10 @@ class CubeFromCubes:
         return Cube(front_side_bottom_left_corner_pos=bottom_left_corner_pos, size=size)
 
     @classmethod
-    def _create_cube_bottom_left_corner_pos(cls, height: int, depth: int, width: int) -> Pos:
+    def _create_cube_bottom_left_corner_pos(cls, height: int, depth: int, width: int) -> Point:
         # these x and y transformations were chosen randomly
         # but cubes positions looks more or less ok after them
         x = ((8 - width * 2) * SPACES_X + depth * SPACES_X + X_OFFSET)
         y = depth * SPACES_X + (5 + height * SPACES_Y) + Y_OFFSET
 
-        return Pos(x, y)
+        return Point(x, y)

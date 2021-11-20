@@ -10,7 +10,11 @@ SPACES_Y = 10
 X_OFFSET = 7
 Y_OFFSET = 2
 
+
 # cube size multiplier
 CUBE_SIZE = 10
+
+# similiar thing
+DRAWING_RATIO = 10
 
 
