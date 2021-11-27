@@ -53,9 +53,9 @@ class CubesWidget(Widget):
     @staticmethod
     def _get_side_shadow_multiplier(side, plot_idx, row_idx, cube_idx):
         side_shadow_multiplier_map = {
-            SIDES.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 7,
-            SIDES.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 7,
-            SIDES.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 7,
+            SIDES.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 70,
+            SIDES.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 70,
+            SIDES.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 70,
         }
 
         return side_shadow_multiplier_map[side]

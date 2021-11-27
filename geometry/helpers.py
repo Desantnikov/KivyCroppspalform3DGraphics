@@ -1,7 +1,5 @@
-def make_flat(input_list):
-    return_list = []
+import itertools
 
-    for value in input_list:
-        return_list.extend(value)
 
-    return return_list
+def flatten(input_list):
+    return list(itertools.chain.from_iterable(input_list))
