@@ -12,7 +12,7 @@ Y_OFFSET = 2
 
 
 # cube size multiplier
-CUBE_SIZE = 10
+CUBE_SIZE = 8
 
 # similiar thing
 DRAWING_RATIO = 10

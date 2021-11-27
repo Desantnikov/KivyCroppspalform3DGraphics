@@ -26,16 +26,21 @@ class CubesWidget(Widget):
         for plot in reversed(self.cube_from_cubes.array):
             for row in plot:
                 for cube in reversed(row):
-                    for cube_side in reversed(cube.drawn_sides):
+                    if touch_point in cube:
+                        cube.transform()
+                        return
 
-                        if touch_point in cube_side:
-                            cube_side.transform()
-                            return
+                    # for cube_side in reversed(cube.drawn_sides):
+                    #
+                    #     if touch_point in cube_side:
+                    #         cube_side.transform()
+                    #         return
 
     def _draw_cubes(self):
         for plot_idx, plot in enumerate(self.cube_from_cubes.array, start=2):  # height (z)
             for row_idx, row in enumerate(reversed(plot), start=2):  # rows from back to front
                 for cube_idx, cube in enumerate(reversed(row), start=2):  # cubes from left to right  #
+
                     for side_idx, side in enumerate(cube.SIDES_DRAWING_ORDER):  # cube sides
 
                         shadow_multiplier = self._get_side_shadow_multiplier(side, plot_idx, row_idx, cube_idx)

@@ -21,11 +21,15 @@ class Cube:
         self.sides[SIDES.RIGHT] = self._calc_right_side()
 
     def __contains__(self, point):
-        return any([point in side for side in self.sides])
+        return any([point in side for side in self.sides.values()])
 
     @property
     def drawn_sides(self):
         return list(filter(lambda side: side.drawn_quad, self.sides.values()))
+
+    def transform(self):
+        for side in self.drawn_sides:
+            side.transform()
 
     def _calc_front_side(self) -> CubeSide:
         front_side_corners_pos_dict = self._calc_square_corners_pos_dict(self.front_side_bottom_left_corner_pos, self.size)

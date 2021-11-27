@@ -26,9 +26,9 @@ class CubeSide:
 
     def transform(self):
         modified_coord_values = [
-            coord - 15
-            if idx in [0, 1, 2, 7]
-            else coord + 15
+            coord + 30
+            if idx % 2
+            else coord
             for idx, coord in enumerate(self.get_corners_coords_flat())
         ]
 
