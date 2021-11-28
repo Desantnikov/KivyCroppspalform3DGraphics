@@ -30,12 +30,6 @@ class CubesWidget(Widget):
                         cube.transform()
                         return
 
-                    # for cube_side in reversed(cube.drawn_sides):
-                    #
-                    #     if touch_point in cube_side:
-                    #         cube_side.transform()
-                    #         return
-
     def _draw_cubes(self):
         for plot_idx, plot in enumerate(self.cube_from_cubes.array, start=2):  # height (z)
             for row_idx, row in enumerate(reversed(plot), start=2):  # rows from back to front

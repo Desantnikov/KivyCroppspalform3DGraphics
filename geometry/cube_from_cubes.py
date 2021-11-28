@@ -33,8 +33,8 @@ class CubeFromCubes:
                     cube = cls._create_cube(height=height, depth=depth, width=width)
                     cubes_row.append(cube)
 
-                cubes_row = cubes_plot.append(cubes_row) or []  # append and clear
-            cubes_plot = cubes_array.append(cubes_plot) or []
+                cubes_row = cubes_plot.append(cubes_row) or []  # append current cubes row and clear
+            cubes_plot = cubes_array.append(cubes_plot) or []  # append current cubes plot and clear
 
         return cubes_array
 
