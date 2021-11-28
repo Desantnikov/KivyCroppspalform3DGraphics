@@ -40,12 +40,18 @@ class CubeFromCubes:
 
     @classmethod
     def _create_cube(cls, height, depth, width, size=CUBE_SIZE):
-        bottom_left_corner_pos = cls._create_cube_bottom_left_corner_pos(height=height, depth=depth, width=width)
+        bottom_left_corner = cls._create_cube_bottom_left_corner(height=height, depth=depth, width=width)
 
-        return Cube(front_side_initial_point=bottom_left_corner_pos, size=size)
+        created_cube = Cube(
+            front_side_initial_point=bottom_left_corner,
+            size=size,
+            position_within_parent_cube=Point(depth, width, height),
+        )
+
+        return created_cube
 
     @classmethod
-    def _create_cube_bottom_left_corner_pos(cls, height: int, depth: int, width: int) -> Point:
+    def _create_cube_bottom_left_corner(cls, height: int, depth: int, width: int) -> Point:
         # these x and y transformations were chosen randomly
         # but cubes positions looks more or less ok after them
         x = ((8 - width * 2) * SPACES_X + depth * SPACES_X + X_OFFSET)

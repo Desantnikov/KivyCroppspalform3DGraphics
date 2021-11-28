@@ -14,7 +14,6 @@ class CubeSide:
         self.side_name = side_name
         self.corners = corners
 
-        self.polygon = Polygon(self.coords)
         self.edges = {
             SPATIAL_DIRECTION.LEFT: (self.corners[0], self.corners[1]),
             SPATIAL_DIRECTION.TOP: (self.corners[1], self.corners[2]),
@@ -25,7 +24,7 @@ class CubeSide:
         self.drawn_quad = None
 
     def __contains__(self, point):
-        return self.polygon.contains(point)
+        return Polygon(self.coords).contains(point)
 
     @property
     def coords(self):
