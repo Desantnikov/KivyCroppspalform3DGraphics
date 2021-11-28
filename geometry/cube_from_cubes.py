@@ -1,15 +1,12 @@
 from geometry.point import Point
-from geometry.cube.cube import Cube
+from geometry.cube import Cube
+from geometry import helpers
 
-from geometry.constants import (
+from constants import (
     CUBES_ARRAY_WIDTH,
     CUBES_ARRAY_HEIGHT,
     CUBES_ARRAY_DEPTH,
-    SPACES_X,
-    SPACES_Y,
     CUBE_SIZE,
-    X_OFFSET,
-    Y_OFFSET,
 )
 
 
@@ -40,7 +37,7 @@ class CubeFromCubes:
 
     @classmethod
     def _create_cube(cls, height, depth, width, size=CUBE_SIZE):
-        bottom_left_corner = cls._create_cube_bottom_left_corner(height=height, depth=depth, width=width)
+        bottom_left_corner = helpers.calc_cube_initial_point(height=height, depth=depth, width=width)
 
         created_cube = Cube(
             front_side_initial_point=bottom_left_corner,
@@ -50,11 +47,4 @@ class CubeFromCubes:
 
         return created_cube
 
-    @classmethod
-    def _create_cube_bottom_left_corner(cls, height: int, depth: int, width: int) -> Point:
-        # these x and y transformations were chosen randomly
-        # but cubes positions looks more or less ok after them
-        x = ((8 - width * 2) * SPACES_X + depth * SPACES_X + X_OFFSET)
-        y = depth * SPACES_X + (5 + height * SPACES_Y) + Y_OFFSET
 
-        return Point(x, y)

@@ -1,10 +1,9 @@
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Quad
 
-from gui.cubes_widget import CubesWidget
-from gui.helpers import make_gradient_texture
+from core_app.cubes_widget import CubesWidget
+from graphic_controller import GraphicController
 
 
 class MainApp(App):
@@ -21,16 +20,16 @@ class MainApp(App):
 
     @staticmethod
     def _draw_background():
-        Color(rgb=(1, 1, 1))
+        GraphicController.set_color((1, 1, 1))
 
         # drawing floor
-        floor_texture = make_gradient_texture(150, 'left_bottom_to_right_top', 75, -90)
+        floor_texture = GraphicController.make_gradient_texture(150, 'left_bottom_to_right_top', 75, -90)
         Quad(points=[10, 10, 450, 450, 1600, 450, 1600, 10], texture=floor_texture)
 
         # drawing left wall
-        left_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 100, 90)
+        left_wall_texture = GraphicController.make_gradient_texture(200, 'left_bottom_to_right_top', 100, 90)
         Quad(points=[10, 10, 10, 1200, 450, 1200, 450, 450], texture=left_wall_texture)
 
         # drawing back wall
-        back_wall_texture = make_gradient_texture(200, 'left_bottom_to_right_top', 105)
+        back_wall_texture = GraphicController.make_gradient_texture(200, 'left_bottom_to_right_top', 105)
         Quad(points=[450, 450, 450, 1600, 1600, 1600, 1600, 450], texture=back_wall_texture)

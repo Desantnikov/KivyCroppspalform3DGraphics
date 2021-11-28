@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import Tuple
 
 from kivy.graphics.vertex_instructions import Quad
 from kivy.animation import Animation
@@ -6,7 +6,7 @@ from shapely.geometry import Polygon
 
 from geometry import helpers
 from geometry.point import Point
-from geometry.cube.enums import SPATIAL_DIRECTION
+from geometry.enums import SPATIAL_DIRECTION
 
 
 class CubeSide:

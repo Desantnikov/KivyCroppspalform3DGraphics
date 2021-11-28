@@ -9,7 +9,6 @@ class CubesWidget(Widget):
         super(CubesWidget, self).__init__(**kwargs)
 
         self.cube_from_cubes = CubeFromCubes()
-        self.sides = []
 
         with self.canvas:
             self._draw_cubes()

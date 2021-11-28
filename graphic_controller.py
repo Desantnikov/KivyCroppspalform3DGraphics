@@ -1,0 +1,81 @@
+from PIL import Image, ImageDraw
+from kivy.graphics.texture import Texture
+from kivy.graphics.context_instructions import Color
+
+from constants import SPACES_X, SPACES_Y, CUBE_SIDES_COLOR_VALUES, BRIGHTNESS_MULTIPLIER
+from geometry.enums import SPATIAL_DIRECTION
+
+
+class GraphicController:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def set_color(rgb):
+        Color(rgb=rgb)
+
+    @classmethod
+    def adjust_brightness(cls, side, cube_idx, row_idx, plot_idx) -> None:
+        """
+            used to adjust brightness according to current cube's position and side
+        """
+
+        side_shadow_multiplier_map = {
+            SPATIAL_DIRECTION.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 70,
+            SPATIAL_DIRECTION.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 70,
+            SPATIAL_DIRECTION.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 70,
+        }
+
+        shadow_multiplier = side_shadow_multiplier_map[side]
+        side_initial_color = CUBE_SIDES_COLOR_VALUES[side]
+        overall_multiplier = shadow_multiplier * BRIGHTNESS_MULTIPLIER
+        recalculated_color = [color_part * overall_multiplier for color_part in side_initial_color]
+
+        cls.set_color(recalculated_color)
+
+    @staticmethod
+    def make_gradient_texture(width=500, light_direction='left_to_right', brightness_increase=None, rotate=None, height=None):
+        if height is None:
+            height = width
+
+        gradient = Image.new('RGBA', (width, height), color=(1))
+        draw = ImageDraw.Draw(gradient, mode='RGBA')
+
+        for x in range(width):
+            for y in range(height):
+                color = int((x+y)/2)
+
+                if light_direction == 'downside':
+                    start, end = (y, x), (y, x)
+                    color = x
+
+                elif light_direction == 'left_to_right':
+                    start, end = (x, y), (x, y)
+                    color = y
+
+                elif light_direction == 'left_bottom_to_right_top':
+                    start, end = (x, y), (y, x)
+                else:
+                    raise Exception('wrong directon')
+
+                if brightness_increase is not None and color < brightness_increase:
+                    color = brightness_increase
+
+                draw.line([start, end],  (255, 255, 255, color), width=1)
+
+
+        # if light_direction == 'right_bottom_to_left_top':
+        #     gradient = gradient.rotate(90)
+        # if light_direction == 'right_top_to_left_bottom':
+        #     gradient = gradient.rotate(90)
+        # gradient.show()
+        if rotate is not None:
+            gradient = gradient.rotate(rotate)
+
+        buf = bytes(gradient.tobytes())
+
+        texture = Texture.create(size=(width, height), bufferfmt='ubyte')
+        texture.wrap = 'clamp_to_edge'
+        texture.blit_buffer(buf, colorfmt='rgba', bufferfmt='ubyte')
+
+        return texture

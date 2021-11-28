@@ -1,8 +1,7 @@
-from kivy.graphics import Color
-
-from geometry.cube.cube_side import CubeSide
+import graphic_controller
+from geometry.cube_side import CubeSide
 from geometry.point import Point
-from geometry.cube.enums import SPATIAL_DIRECTION
+from geometry.enums import SPATIAL_DIRECTION
 from geometry import helpers
 
 
@@ -56,10 +55,7 @@ class Cube:
         for side_name in self.SIDES_DRAWING_ORDER:
             cube_idx, row_idx, plot_idx = self.position_within_parent_cube.coords[0]
 
-            shadow_multiplier = helpers.get_side_shadow_multiplier(side_name, plot_idx, row_idx, cube_idx)
-            color_with_shadow = helpers.adjust_color_brightness(side_name, shadow_multiplier)
-
-            Color(rgb=color_with_shadow)
+            graphic_controller.GraphicController.adjust_brightness(side_name, cube_idx, row_idx, plot_idx)
 
             self.sides[side_name].draw()
 
