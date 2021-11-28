@@ -5,7 +5,7 @@ from kivy.uix.widget import Widget
 
 from geometry.constants import SPACES_Y, SPACES_X
 from geometry.cube_from_cubes import CubeFromCubes
-from geometry.cube.enums import SIDES
+from geometry.cube.enums import SPATIAL_DIRECTION
 from geometry.point import Point
 from gui.constants import CUBE_SIDES_COLOR_VALUES, BRIGHTNESS_MULTIPLIER
 
@@ -47,9 +47,9 @@ class CubesWidget(Widget):
     @staticmethod
     def _get_side_shadow_multiplier(side, plot_idx, row_idx, cube_idx):
         side_shadow_multiplier_map = {
-            SIDES.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 70,
-            SIDES.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 70,
-            SIDES.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 70,
+            SPATIAL_DIRECTION.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 70,
+            SPATIAL_DIRECTION.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 70,
+            SPATIAL_DIRECTION.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 70,
         }
 
         return side_shadow_multiplier_map[side]

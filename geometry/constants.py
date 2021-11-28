@@ -6,8 +6,11 @@ CUBES_ARRAY_DEPTH = 4
 CUBE_SIZE = 75
 
 # spaces between cubes
-SPACES_X = CUBE_SIZE * 0.5
+SPACES_X = CUBE_SIZE * 0.5  # no spaces - new cube starts where previous ends
 SPACES_Y = CUBE_SIZE
+# add spaces
+SPACES_X += 10
+SPACES_Y += 20
 
 # first cubes line offset
 X_OFFSET = 300

@@ -42,7 +42,7 @@ class CubeFromCubes:
     def _create_cube(cls, height, depth, width, size=CUBE_SIZE):
         bottom_left_corner_pos = cls._create_cube_bottom_left_corner_pos(height=height, depth=depth, width=width)
 
-        return Cube(front_side_bottom_left_corner_pos=bottom_left_corner_pos, size=size)
+        return Cube(front_side_initial_point=bottom_left_corner_pos, size=size)
 
     @classmethod
     def _create_cube_bottom_left_corner_pos(cls, height: int, depth: int, width: int) -> Point:
