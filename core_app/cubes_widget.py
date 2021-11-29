@@ -14,12 +14,17 @@ class CubesWidget(Widget):
             self._draw_cubes()
 
     def on_touch_up(self, touch):
+        import time
+
+        start_time = time.time()
+
         touch_point = Point(*touch.pos)
         for plot in reversed(self.cube_from_cubes.array):
             for row in plot:
                 for cube in reversed(row):
                     if touch_point in cube:
                         cube.transform()
+                        print(f'Took: {time.time() - start_time}')
                         return
 
     def _draw_cubes(self):

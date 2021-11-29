@@ -28,7 +28,7 @@ class CubeSide:
 
     @property
     def coords(self):
-        return list((corner.x, corner.y) for corner in self.corners)
+        return tuple((corner.x, corner.y) for corner in self.corners)
 
     def draw(self, texture=None):
         assert self.drawn_quad is None, 'Trying to draw already drawn figure'

@@ -17,28 +17,25 @@ class Cube:
     def __init__(self, front_side_initial_point: Point, size: int, position_within_parent_cube: Point):
         self.position_within_parent_cube = position_within_parent_cube
         self.size = size
+        self.sides = {}
 
-        # back side initial point == center of front side
-        back_side_initial_point = front_side_initial_point.apply_delta(
-            delta_x=self.size / 2,
-            delta_y=self.size / 2,
-        )
-
+        # calc and save front and back sides initial points
+        back_side_initial_point = front_side_initial_point.apply_delta(delta_x=self.size / 2, delta_y=self.size / 2,)
         self.sides_initial_points = {
             SPATIAL_DIRECTION.FRONT: front_side_initial_point,
             SPATIAL_DIRECTION.BACK: back_side_initial_point,
         }
 
-        self.sides = {}
+        # fill self.sides with CubeSide instances
         for side_name in self.SIDES_CALCULATION_ORDER:
             self.sides[side_name] = self.calc_side(side_name)
 
     def __contains__(self, point):
-        return any([point in side for side in self.sides.values()])
+        return any(point in side for side in self.drawn_sides)
 
     @property
     def drawn_sides(self):
-        return list(filter(lambda side: side.drawn_quad is not None, self.sides.values()))
+        return filter(lambda side: side.drawn_quad, self.sides.values())
 
     def calc_side(self, side_name: SPATIAL_DIRECTION) -> CubeSide:
         if side_name in [SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK]:
