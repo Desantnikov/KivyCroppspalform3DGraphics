@@ -1,3 +1,5 @@
+import itertools
+
 from kivy.uix.widget import Widget
 
 from geometry.cube_from_cubes import CubeFromCubes
@@ -19,6 +21,7 @@ class CubesWidget(Widget):
         start_time = time.time()
 
         touch_point = Point(*touch.pos)
+
         for plot in reversed(self.cube_from_cubes.array):
             for row in plot:
                 for cube in reversed(row):

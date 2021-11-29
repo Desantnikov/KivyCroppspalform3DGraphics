@@ -22,9 +22,10 @@ class CubeSide:
         }
 
         self.drawn_quad = None
+        self.drawn_polygon = None
 
     def __contains__(self, point):
-        return Polygon(self.coords).contains(point)
+        return self.drawn_polygon and self.drawn_polygon.contains(point) #Polygon(self.coords).contains(point)
 
     @property
     def coords(self):
@@ -34,6 +35,7 @@ class CubeSide:
         assert self.drawn_quad is None, 'Trying to draw already drawn figure'
         self.drawn_quad = Quad(points=helpers.flatten(self.coords), texture=texture)
 
+        self.drawn_polygon = Polygon(self.coords)
         return self.drawn_quad
 
     def transform(self):
