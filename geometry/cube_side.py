@@ -25,7 +25,7 @@ class CubeSide:
         self.drawn_polygon = None
 
     def __contains__(self, point):
-        return self.drawn_polygon and self.drawn_polygon.contains(point) #Polygon(self.coords).contains(point)
+        return self.drawn_polygon.contains(point) #Polygon(self.coords).contains(point)
 
     @property
     def coords(self):
