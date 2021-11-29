@@ -13,6 +13,7 @@ class CubeSide:
     def __init__(self, side_name: SPATIAL_DIRECTION, corners: Tuple[Point, ...]):
         self.side_name = side_name
         self.corners = corners
+        self.coords = tuple((corner.x, corner.y) for corner in self.corners)
 
         self.edges = {
             SPATIAL_DIRECTION.LEFT: (self.corners[0], self.corners[1]),
@@ -27,9 +28,9 @@ class CubeSide:
     def __contains__(self, point):
         return self.drawn_polygon.contains(point) #Polygon(self.coords).contains(point)
 
-    @property
-    def coords(self):
-        return tuple((corner.x, corner.y) for corner in self.corners)
+    # @property
+    # def coords(self):
+    #     return tuple((corner.x, corner.y) for corner in self.corners)
 
     def draw(self, texture=None):
         assert self.drawn_quad is None, 'Trying to draw already drawn figure'
