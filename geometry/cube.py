@@ -1,5 +1,6 @@
 import graphic_controller
 from kivy.properties import AliasProperty
+from kivy.event import EventDispatcher
 
 from geometry.cube_side import CubeSide
 from geometry.point import Point

@@ -36,21 +36,21 @@ class CubesWidget(Widget):
         print(f'\nCalculating cubes: {cube_from_cubes_creation_time}\n'
               f'Drawing cubes: {drawing_time}\n')
 
-    # def on_touch_up(self, touch):
-    #     import time
-    #
-    #     start_time = time.time()
-    #
-    #     touch_point = Point(*touch.pos)
-    #
-    #
-    #     for plot in self.cube_from_cubes.array[::-1]:
-    #         for row in plot:
-    #             for cube in row[::-1]:
-    #                 if touch_point in cube:
-    #                     cube.transform()
-    #                     print(f'Took: {time.time() - start_time}')
-    #                     return
+    def on_touch_up(self, touch):
+        import time
+
+        start_time = time.time()
+
+        touch_point = Point(*touch.pos)
+
+
+        for plot in self.cube_from_cubes.array[::-1]:
+            for row in plot:
+                for cube in row[::-1]:
+                    if touch_point in cube:
+                        cube.transform()
+                        print(f'Took: {time.time() - start_time}')
+                        return
 
     def _draw_cubes(self):
         for plot in self.cube_from_cubes.array:  # height (z)
