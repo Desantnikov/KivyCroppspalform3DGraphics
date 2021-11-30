@@ -1,19 +1,24 @@
 from typing import Tuple
 
+from kivy.graphics import Color
 from kivy.graphics.vertex_instructions import Quad
 from kivy.animation import Animation
+
 from shapely.geometry import Polygon
 
 from geometry import helpers
 from geometry.point import Point
 from geometry.enums import SPATIAL_DIRECTION
+from constants import CUBE_SIDE_INITIAL_COLORS_VALUES
 
 
 class CubeSide:
     def __init__(self, side_name: SPATIAL_DIRECTION, corners: Tuple[Point, ...]):
         self.side_name = side_name
+        self.initial_color_values = CUBE_SIDE_INITIAL_COLORS_VALUES.get(self.side_name.name)
+
         self.corners = corners
-        self.coords = tuple((corner.x, corner.y) for corner in self.corners)
+        self.coords = tuple(corner.coords[0] for corner in self.corners)
 
         self.edges = {
             SPATIAL_DIRECTION.LEFT: (self.corners[0], self.corners[1]),
@@ -32,9 +37,13 @@ class CubeSide:
     # def coords(self):
     #     return tuple((corner.x, corner.y) for corner in self.corners)
 
-    def draw(self, texture=None):
+
+
+    def draw(self):
         assert self.drawn_quad is None, 'Trying to draw already drawn figure'
-        self.drawn_quad = Quad(points=helpers.flatten(self.coords), texture=texture)
+        from kivy.uix.widget import Widget
+        self.drawn_quad = Quad(points=helpers.flatten(self.coords), color=Color(rgb=self.initial_color_values))
+        # self.drawn_quad.on_collide=self.transform()
 
         self.drawn_polygon = Polygon(self.coords)
         return self.drawn_quad

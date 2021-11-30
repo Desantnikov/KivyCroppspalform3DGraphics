@@ -1,4 +1,6 @@
 import graphic_controller
+from kivy.properties import AliasProperty
+
 from geometry.cube_side import CubeSide
 from geometry.point import Point
 from geometry.enums import SPATIAL_DIRECTION
@@ -52,7 +54,7 @@ class Cube:
         for side_name in self.SIDES_DRAWING_ORDER:
             cube_idx, row_idx, plot_idx = self.position_within_parent_cube.coords[0]
 
-            graphic_controller.GraphicController.adjust_brightness(side_name, cube_idx, row_idx, plot_idx)
+            # graphic_controller.GraphicController.adjust_brightness(side_name, cube_idx, row_idx, plot_idx)
 
             self.sides[side_name].draw()
 

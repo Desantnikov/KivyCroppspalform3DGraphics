@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw
 from kivy.graphics.texture import Texture
 from kivy.graphics.context_instructions import Color
 
-from constants import SPACES_X, SPACES_Y, CUBE_SIDES_COLOR_VALUES, BRIGHTNESS_MULTIPLIER
+from constants import SPACES_X, SPACES_Y, CUBE_SIDE_INITIAL_COLORS_VALUES, BRIGHTNESS_MULTIPLIER
 from geometry.enums import SPATIAL_DIRECTION
 
 
@@ -29,11 +29,11 @@ class GraphicController:
         }
 
         shadow_multiplier = side_shadow_multiplier_map[side]
-        side_initial_color = CUBE_SIDES_COLOR_VALUES[side]
+        side_initial_color = CUBE_SIDE_INITIAL_COLORS_VALUES[side]
         overall_multiplier = shadow_multiplier * BRIGHTNESS_MULTIPLIER
         recalculated_color = (color_part * overall_multiplier for color_part in side_initial_color)
 
-        cls.set_color(tuple(recalculated_color))
+        # cls.set_color(tuple(recalculated_color))
 
     @staticmethod
     def make_gradient_texture(width=500, light_direction='left_to_right', brightness_increase=None, rotate=None, height=None):
