@@ -10,10 +10,9 @@ from constants import (
 )
 
 
+# Class used to create, incapsulate and operate with a 3-D array of cubes
 class CubeFromCubes:
-    """
-        Class used to create, incapsulate and operate with a 3-D array of cubes
-    """
+    __slots__ = 'array',
 
     def __init__(self):
         self.array = self.create_cubes_array()
