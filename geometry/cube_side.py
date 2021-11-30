@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from kivy.event import EventDispatcher
+from kivy.uix.behaviors.button import ButtonBehavior
 from kivy.graphics import Color
 from kivy.graphics.vertex_instructions import Quad
 from kivy.animation import Animation
@@ -13,12 +13,11 @@ from geometry.enums import SPATIAL_DIRECTION
 from constants import CUBE_SIDE_INITIAL_COLORS_VALUES
 
 
-class CubeSide(EventDispatcher):
-    def __init__(self, side_name: SPATIAL_DIRECTION, corners: Tuple[Point, ...]):
-        super().__init__()
+class CubeSide:
+    INITIAL_COLORS_RGB = CUBE_SIDE_INITIAL_COLORS_VALUES
 
+    def __init__(self, side_name: SPATIAL_DIRECTION, corners: Tuple[Point, ...]):
         self.side_name = side_name
-        self.initial_color_values = CUBE_SIDE_INITIAL_COLORS_VALUES.get(self.side_name.name)
 
         self.corners = corners
         self.coords = tuple(corner.coords[0] for corner in self.corners)
@@ -34,28 +33,12 @@ class CubeSide(EventDispatcher):
         self.drawn_polygon = None
 
     def __contains__(self, point):
-        return self.drawn_polygon.contains(point) #Polygon(self.coords).contains(point)
-
-    # @property
-    # def coords(self):
-    #     return tuple((corner.x, corner.y) for corner in self.corners)
-
-
+        return Polygon(self.coords).contains(point)
 
     def draw(self):
         assert self.drawn_quad is None, 'Trying to draw already drawn figure'
-        from kivy.uix.widget import Widget
 
-        self.widget = Widget()
-
-        self.drawn_quad = Quad(points=helpers.flatten(self.coords), color=Color(rgb=self.initial_color_values))
-        self.widget.canvas.add(self.drawn_quad)
-
-
-        # self.drawn_quad.on_collide=self.transform()
-
-        self.drawn_polygon = Polygon(self.coords)
-        return self.drawn_quad
+        self.drawn_quad = Quad(points=helpers.flatten(self.coords))#, color=Color(rgb=self.INITIAL_COLORS_RGB[self.side_name.name]))
 
     def transform(self):
         modified_coord_values = [

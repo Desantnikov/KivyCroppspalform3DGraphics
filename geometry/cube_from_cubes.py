@@ -18,8 +18,6 @@ class CubeFromCubes:
     def __init__(self):
         self.array = self.create_cubes_array()
 
-        self.array_reversed = tuple(reversed(self.array))
-
     @classmethod
     def create_cubes_array(cls):
         cubes_array = []

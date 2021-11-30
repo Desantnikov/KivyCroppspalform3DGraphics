@@ -1,14 +1,12 @@
-from kivy.graphics import Color
-
 
 """ Main """
-CUBES_ARRAY_WIDTH = 4  # should be dividable by 2
-CUBES_ARRAY_HEIGHT = 4
-CUBES_ARRAY_DEPTH = 4
+CUBES_ARRAY_WIDTH = 14  # should be dividable by 2
+CUBES_ARRAY_HEIGHT = 14
+CUBES_ARRAY_DEPTH = 14
 
 
 """ Geometry """
-CUBE_SIZE = 80
+CUBE_SIZE = 35
 
 X_OFFSET = 600
 Y_OFFSET = 50
@@ -25,6 +23,6 @@ SPACES_Y = CUBE_SIZE * 1.1
 CUBE_SIDE_INITIAL_COLORS_VALUES = {
     'FRONT': (0.6, 0.6, 0.6),  # front
     'TOP': (0.80, 0.80, 0.80),  # top
-    'RIGHT': (0.95, 0.95, 0.95),  # right
+    'RIGHT': (0.9, 0.9, 0.9),  # right
 }
 BRIGHTNESS_MULTIPLIER = 0.3
