@@ -14,14 +14,8 @@ from constants import CUBE_SIDE_INITIAL_COLORS_VALUES, CUBE_SIZE, SPACES_X, SPAC
 
 class Cube:
     __slots__ = ['position_within_parent_cube', 'size', 'sides', 'transformation_in_progress']
-
-    SIDES_DRAWING_ORDER = [SPATIAL_DIRECTION.TOP, SPATIAL_DIRECTION.RIGHT, SPATIAL_DIRECTION.FRONT]
-    SIDES_CALCULATION_ORDER = [
-        SPATIAL_DIRECTION.FRONT,
-        SPATIAL_DIRECTION.BACK,
-        SPATIAL_DIRECTION.TOP,
-        SPATIAL_DIRECTION.RIGHT,
-    ]
+    SQUARE_SIDES = set([SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK])
+    SIDES_DRAWING_ORDER = [SPATIAL_DIRECTION.LEFT, SPATIAL_DIRECTION.TOP, SPATIAL_DIRECTION.RIGHT, SPATIAL_DIRECTION.FRONT]
 
     def __init__(self, position_within_parent_cube: Point, size: int = CUBE_SIZE):
         self.position_within_parent_cube = position_within_parent_cube
@@ -39,10 +33,6 @@ class Cube:
         return filter(lambda side: side.drawn_quad, self.sides.values())
 
     def draw_sides(self):
-        # for side_name in self.SIDES_DRAWING_ORDER:
-        #     for edge in self.sides[side_name].edges.values():
-        #         Line(points=helpers.flatten([point.coords[0] for point in edge]), color=(1,1,1))
-
         for side_name in self.SIDES_DRAWING_ORDER:
             cube_idx, row_idx, plot_idx = self.position_within_parent_cube.coords_flat
 
@@ -56,16 +46,16 @@ class Cube:
 
             self.sides[side_name].draw_side()
 
-    def _redraw(self):
+    def change_front_side_points(self, new_points):
         for side in filter(lambda x: x.drawn_quad, self.sides.values()):
-            side.edit_drawing([0, 0, 0, 100, 100, 100, 100, 0])
+            side.edit_drawing(new_points=new_points)
             # side.drawn_quad.texture = graphic_controller.GraphicController.make_gradient_texture(height=256)
 
     def touched(self, touch_button: str):
         if touch_button == 'right':
-            self._redraw()
+            self.change_front_side_points(new_points=[0, 0, 0, 0, 0, 0, 0, 0])
         elif touch_button == 'left':
-            self._transform()
+            self._transform(transformation=TRANSFORMATION.EXPAND_AND_ROTATE)
 
     def _transform(self, transformation: TRANSFORMATION = None):
         if transformation is None:
@@ -75,22 +65,18 @@ class Cube:
             side.transform(transformation=transformation)
 
     def _set_sides(self):
-        for side_name in self.SIDES_CALCULATION_ORDER:
-            if side_name in [SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK]:
-                self.sides[side_name] = CubeSide(
-                    side_name=side_name,
-                    corners=self._calc_square_corners(side_name=side_name)
-                )
-                continue
+        # calc square (front and back) sides first
+        for side_name in self.SQUARE_SIDES:
+            corners = self._calc_square_corners(side_name=side_name)
+            self.sides[side_name] = CubeSide(side_name=side_name, corners=corners)
 
+        # use already calculated front/back side corners to calc remaining sides
+        for side_name in set(SPATIAL_DIRECTION) - self.SQUARE_SIDES:
             # corners order should be preserved for correct drawing
             corners = self.sides[SPATIAL_DIRECTION.FRONT].edges[side_name]
             corners += self.sides[SPATIAL_DIRECTION.BACK].edges[side_name][::-1]
 
-            self.sides[side_name] = CubeSide(
-                side_name=side_name,
-                corners=corners,
-            )
+            self.sides[side_name] = CubeSide(side_name=side_name, corners=corners)
 
     def _calc_initial_point(self, side_name: SPATIAL_DIRECTION = SPATIAL_DIRECTION.FRONT) -> Point:
         """

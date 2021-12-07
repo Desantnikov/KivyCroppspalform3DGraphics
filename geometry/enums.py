@@ -15,3 +15,4 @@ class TRANSFORMATION(IntEnum):
     MOVE_DOWN = 1
     MOVE_RIGHT = 2
     MOVE_LEFT = 3
+    EXPAND_AND_ROTATE = 4

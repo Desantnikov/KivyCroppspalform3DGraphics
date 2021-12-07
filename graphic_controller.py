@@ -31,6 +31,7 @@ class GraphicController:
             SPATIAL_DIRECTION.TOP: (cube_idx / ((cube_idx + row_idx) / 2)),
             SPATIAL_DIRECTION.FRONT: cube_idx / ((cube_idx + row_idx + cube_idx) / 3),
             SPATIAL_DIRECTION.RIGHT: cube_idx / ((cube_idx + row_idx + row_idx) / 3),
+            SPATIAL_DIRECTION.LEFT: cube_idx / ((cube_idx + row_idx + row_idx) / 3),
         }
 
         side_shadow_multiplier = side_shadow_multiplier_map[side]
