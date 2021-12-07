@@ -29,6 +29,7 @@ class CubesWidget(Widget):
         all_cubes_flat_list = flatten(flatten(self.cube_from_cubes.array[::-1]))
 
         for collided_cube in filter(lambda cube: touch_point in cube, all_cubes_flat_list):
-            collided_cube.touched()
+            with self.canvas:
+                collided_cube.touched()
 
             return

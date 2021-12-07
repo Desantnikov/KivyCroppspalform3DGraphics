@@ -49,7 +49,13 @@ class Cube:
 
             self.sides[side_name].draw()
 
+    def _redraw(self):
+        for side in filter(lambda x: x.drawn_quad, self.sides.values()):
+            side.edit_drawing([0, 0, 0, 0, 0, 0, 0, 0])
+            # side.drawn_quad.texture = graphic_controller.GraphicController.make_gradient_texture(height=256)
+
     def touched(self):
+        self._redraw()
         self._transform()
 
     def _transform(self, transformation: TRANSFORMATION = None):
@@ -62,15 +68,20 @@ class Cube:
     def _set_sides(self):
         for side_name in self.SIDES_CALCULATION_ORDER:
             if side_name in [SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK]:
-                initial_point = self._calc_initial_point(side_name=side_name)
-                corners = helpers.calc_square_corners(initial_point, self.size)
-                self.sides[side_name] = CubeSide(side_name=side_name, corners=corners)
+                self.sides[side_name] = CubeSide(
+                    side_name=side_name,
+                    corners=self._calc_square_corners(side_name=side_name)
+                )
                 continue
 
-            # order should be preserved for correct drawing
+            # corners order should be preserved for correct drawing
             corners = self.sides[SPATIAL_DIRECTION.FRONT].edges[side_name]
             corners += self.sides[SPATIAL_DIRECTION.BACK].edges[side_name][::-1]
-            self.sides[side_name] = CubeSide(side_name=side_name, corners=corners)
+
+            self.sides[side_name] = CubeSide(
+                side_name=side_name,
+                corners=corners,
+            )
 
     def _calc_initial_point(self, side_name: SPATIAL_DIRECTION = SPATIAL_DIRECTION.FRONT) -> Point:
         """
@@ -89,3 +100,13 @@ class Cube:
         }
 
         return side_to_point_map[side_name]
+
+    def _calc_square_corners(self, side_name: SPATIAL_DIRECTION):
+        initial_point = self._calc_initial_point(side_name=side_name)
+
+        return (
+            initial_point,  # bottom left
+            initial_point.apply_delta(0, self.size),  # top left
+            initial_point.apply_delta(self.size, self.size),  # top right
+            initial_point.apply_delta(self.size, 0),  # bottom right
+        )

@@ -7,15 +7,15 @@ def flatten(nested_iterable):
     return tuple(itertools.chain.from_iterable(nested_iterable))
 
 
-def calc_square_corners(initial_point, size):
-    square_corners = [
-        initial_point,  # bottom left
-        initial_point.apply_delta(0, size),  # top left
-        initial_point.apply_delta(size, size),  # top right
-        initial_point.apply_delta(size, 0),  # bottom right
-    ]
+def pair(flat_iterable):
+    # -> [1, 2, 3, 4, 5, 6]
+    # <- [[1, 2], [3, 4], [5, 6]]
+    result_list = []
 
-    return square_corners
+    for i in range(0, len(flat_iterable), 2):
+        result_list.append(flat_iterable[i:i+2])
+
+    return result_list
 
 
 def print_time_elapsed(func):
