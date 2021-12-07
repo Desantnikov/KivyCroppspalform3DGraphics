@@ -8,3 +8,7 @@ class Point(point.Point):
         x = self.x + delta_x
         y = self.y + delta_y
         return Point(x, y)
+
+    @property
+    def coords_flat(self):
+        return self.coords[0]

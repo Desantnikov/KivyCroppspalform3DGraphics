@@ -4,12 +4,8 @@ import time
 from kivy.uix.widget import Widget
 
 from geometry.cube_from_cubes import CubeFromCubes
-from geometry.cube import Cube, CubeSide
 from geometry.point import Point
 from geometry.helpers import flatten
-from graphic_controller import GraphicController
-from kivy.graphics import RenderContext, Color, Rectangle, BindTexture
-from kivy.uix.behaviors import CompoundSelectionBehavior, FocusBehavior, ButtonBehavior
 from geometry.helpers import print_time_elapsed
 
 

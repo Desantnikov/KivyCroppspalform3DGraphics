@@ -1,3 +1,4 @@
+from typing import Iterable
 import time
 import itertools
 

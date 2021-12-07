@@ -35,7 +35,14 @@ class CubeFromCubes:
 
     @print_time_elapsed
     def draw(self):
+        from kivy.graphics import Color
+
         for plot in self.array:  # height (z)
             for row in plot[::-1]:  # rows from back to front
                 for cube in row[::-1]:  # cubes from left to right  #
-                    cube.draw()
+                    cube.draw_sides()
+
+                    Color(rgb=(0, 0, 0))
+
+                    for side in cube.drawn_sides:
+                        side.draw_edges()
