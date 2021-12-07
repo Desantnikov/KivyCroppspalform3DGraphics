@@ -30,6 +30,6 @@ class CubesWidget(Widget):
 
         for collided_cube in filter(lambda cube: touch_point in cube, all_cubes_flat_list):
             with self.canvas:
-                collided_cube.touched()
+                collided_cube.touched(touch_button=touch.button)
 
             return

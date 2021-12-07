@@ -54,9 +54,11 @@ class Cube:
             side.edit_drawing([0, 0, 0, 0, 0, 0, 0, 0])
             # side.drawn_quad.texture = graphic_controller.GraphicController.make_gradient_texture(height=256)
 
-    def touched(self):
-        self._redraw()
-        self._transform()
+    def touched(self, touch_button: str):
+        if touch_button == 'right':
+            self._redraw()
+        elif touch_button == 'left':
+            self._transform()
 
     def _transform(self, transformation: TRANSFORMATION = None):
         if transformation is None:
