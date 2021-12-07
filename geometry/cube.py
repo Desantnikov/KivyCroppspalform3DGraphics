@@ -60,9 +60,9 @@ class Cube:
             graphic_controller.GraphicController.adjust_brightness(
                 side=side_name,
                 initial_color=CUBE_SIDE_INITIAL_COLORS_VALUES[side_name.name],
-                cube_idx=cube_idx,
-                row_idx=row_idx,
-                plot_idx=plot_idx,
+                cube_idx=cube_idx+1,
+                row_idx=row_idx+1,
+                plot_idx=plot_idx+1,
             )
 
             self.sides[side_name].draw()

@@ -4,7 +4,6 @@ from PIL import Image, ImageDraw
 from kivy.graphics.texture import Texture
 from kivy.graphics.context_instructions import Color
 
-from constants import SPACES_X, SPACES_Y, BRIGHTNESS_MULTIPLIER
 from geometry.enums import SPATIAL_DIRECTION
 
 
@@ -23,14 +22,14 @@ class GraphicController:
         """
 
         side_shadow_multiplier_map = {
-            SPATIAL_DIRECTION.TOP: (plot_idx + plot_idx + plot_idx + cube_idx + row_idx + SPACES_Y + SPACES_X) / 70,
-            SPATIAL_DIRECTION.FRONT: (plot_idx + row_idx + cube_idx + row_idx + row_idx + SPACES_Y + SPACES_X) / 70,
-            SPATIAL_DIRECTION.RIGHT: (cube_idx + plot_idx + cube_idx + row_idx + cube_idx + SPACES_Y + SPACES_X) / 70,
+            SPATIAL_DIRECTION.TOP: (cube_idx / ((cube_idx + row_idx) / 2)),
+            SPATIAL_DIRECTION.FRONT: cube_idx / ((cube_idx + row_idx + cube_idx) / 3),
+            SPATIAL_DIRECTION.RIGHT: cube_idx / ((cube_idx + row_idx + row_idx) / 3),
         }
 
-        shadow_multiplier = side_shadow_multiplier_map[side]
-        overall_multiplier = shadow_multiplier * BRIGHTNESS_MULTIPLIER
-        recalculated_color = (color_part * overall_multiplier for color_part in initial_color)
+        side_shadow_multiplier = side_shadow_multiplier_map[side]
+
+        recalculated_color = (color_part * side_shadow_multiplier for color_part in initial_color)
 
         cls.set_color(tuple(recalculated_color))
 

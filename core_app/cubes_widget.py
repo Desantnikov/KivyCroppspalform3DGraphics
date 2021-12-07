@@ -37,7 +37,6 @@ class CubesWidget(Widget):
         print(f'\nCalculating cubes: {cube_from_cubes_creation_time}\n'
               f'Drawing cubes: {drawing_time}\n')
 
-
     def on_touch_up(self, touch):
         import time
 
