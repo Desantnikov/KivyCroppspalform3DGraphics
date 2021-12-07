@@ -1,3 +1,5 @@
+from typing import Tuple
+import random
 
 import graphic_controller
 from kivy.properties import AliasProperty
@@ -5,9 +7,9 @@ from kivy.event import EventDispatcher
 
 from geometry.cube_side import CubeSide
 from geometry.point import Point
-from geometry.enums import SPATIAL_DIRECTION
+from geometry.enums import SPATIAL_DIRECTION, TRANSFORMATION
 from geometry import helpers
-from constants import CUBE_SIDE_INITIAL_COLORS_VALUES
+from constants import CUBE_SIDE_INITIAL_COLORS_VALUES, CUBE_SIZE, SPACES_X, SPACES_Y, X_OFFSET, Y_OFFSET
 
 
 class Cube:
@@ -19,21 +21,12 @@ class Cube:
         SPATIAL_DIRECTION.RIGHT,
     ]
 
-    def __init__(self, front_side_initial_point: Point, size: int, position_within_parent_cube: Point):
+    def __init__(self, position_within_parent_cube: Point, size: int = CUBE_SIZE):
         self.position_within_parent_cube = position_within_parent_cube
         self.size = size
+
         self.sides = {}
-
-        # calc and save front and back sides initial points
-        back_side_initial_point = front_side_initial_point.apply_delta(delta_x=self.size / 2, delta_y=self.size / 2,)
-        self.sides_initial_points = {
-            SPATIAL_DIRECTION.FRONT: front_side_initial_point,
-            SPATIAL_DIRECTION.BACK: back_side_initial_point,
-        }
-
-        # fill self.sides with CubeSide instances
-        for side_name in self.SIDES_CALCULATION_ORDER:
-            self.sides[side_name] = self.calc_side(side_name)
+        self._set_sides()
 
     def __contains__(self, point):
         return any(point in side for side in self.drawn_sides)
@@ -42,17 +35,6 @@ class Cube:
     def drawn_sides(self):
         return filter(lambda side: side.drawn_quad, self.sides.values())
 
-    def calc_side(self, side_name: SPATIAL_DIRECTION) -> CubeSide:
-        if side_name in [SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK]:
-            initial_point = self.sides_initial_points[side_name]
-            corners = helpers.calc_square_corners(initial_point, self.size)
-            return CubeSide(side_name=side_name, corners=corners)
-
-        # if not FRONT/BACK side - just choose already calculated corners according to side position
-        corners = self.sides[SPATIAL_DIRECTION.FRONT].edges[side_name]
-        corners += self.sides[SPATIAL_DIRECTION.BACK].edges[side_name][::-1]  # reversed order is necessary for drawing
-        return CubeSide(side_name=side_name, corners=corners)
-
     def draw(self):
         for side_name in self.SIDES_DRAWING_ORDER:
             cube_idx, row_idx, plot_idx = self.position_within_parent_cube.coords[0]
@@ -60,15 +42,50 @@ class Cube:
             graphic_controller.GraphicController.adjust_brightness(
                 side=side_name,
                 initial_color=CUBE_SIDE_INITIAL_COLORS_VALUES[side_name.name],
-                cube_idx=cube_idx+1,
-                row_idx=row_idx+1,
-                plot_idx=plot_idx+1,
+                cube_idx=cube_idx + 1,
+                row_idx=row_idx + 1,
+                plot_idx=plot_idx + 1,
             )
 
             self.sides[side_name].draw()
 
-    def transform(self):
+    def touched(self):
+        self._transform()
+
+    def _transform(self, transformation: TRANSFORMATION = None):
+        if transformation is None:
+            transformation = random.choice(list(TRANSFORMATION))
+
         for side in self.drawn_sides:
-            side.transform()
+            side.transform(transformation=transformation)
 
+    def _set_sides(self):
+        for side_name in self.SIDES_CALCULATION_ORDER:
+            if side_name in [SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK]:
+                initial_point = self._calc_initial_point(side_name=side_name)
+                corners = helpers.calc_square_corners(initial_point, self.size)
+                self.sides[side_name] = CubeSide(side_name=side_name, corners=corners)
+                continue
 
+            # order should be preserved for correct drawing
+            corners = self.sides[SPATIAL_DIRECTION.FRONT].edges[side_name]
+            corners += self.sides[SPATIAL_DIRECTION.BACK].edges[side_name][::-1]
+            self.sides[side_name] = CubeSide(side_name=side_name, corners=corners)
+
+    def _calc_initial_point(self, side_name: SPATIAL_DIRECTION = SPATIAL_DIRECTION.FRONT) -> Point:
+        """
+        returns initial point for a side of a cube based on a cube's position within parent cube
+        these x and y transformations were chosen randomly but cubes positions looks more or less ok after them
+        """
+
+        depth, width, height = self.position_within_parent_cube.coords[0]
+
+        x = ((8 - width * 2) * SPACES_X + depth * SPACES_X + X_OFFSET)
+        y = depth * SPACES_X + (5 + height * SPACES_Y) + Y_OFFSET
+
+        side_to_point_map = {
+            SPATIAL_DIRECTION.FRONT: Point(x, y),
+            SPATIAL_DIRECTION.BACK: Point(x, y).apply_delta(delta_x=self.size / 2, delta_y=self.size / 2),
+        }
+
+        return side_to_point_map[side_name]

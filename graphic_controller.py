@@ -12,8 +12,14 @@ class GraphicController:
         pass
 
     @staticmethod
-    def set_color(rgb):
-        Color(rgb=rgb)
+    def set_color(color_tuple):
+        color_tuple_length = len(color_tuple)
+
+        if color_tuple_length == 3:
+            Color(rgb=color_tuple)
+
+        elif color_tuple_length == 4:
+            Color(rgba=color_tuple)
 
     @classmethod
     def adjust_brightness(cls, side, initial_color, cube_idx, row_idx, plot_idx) -> None:

@@ -9,7 +9,7 @@ from shapely.geometry import Polygon
 
 from geometry import helpers
 from geometry.point import Point
-from geometry.enums import SPATIAL_DIRECTION
+from geometry.enums import SPATIAL_DIRECTION, TRANSFORMATION
 from constants import CUBE_SIDE_INITIAL_COLORS_VALUES
 
 
@@ -30,7 +30,6 @@ class CubeSide:
         }
 
         self.drawn_quad = None
-        self.drawn_polygon = None
 
     def __contains__(self, point):
         return Polygon(self.coords).contains(point)
@@ -38,15 +37,40 @@ class CubeSide:
     def draw(self):
         assert self.drawn_quad is None, 'Trying to draw already drawn figure'
 
-        self.drawn_quad = Quad(points=helpers.flatten(self.coords))#, color=Color(rgb=self.INITIAL_COLORS_RGB[self.side_name.name]))
+        self.drawn_quad = Quad(points=helpers.flatten(self.coords))
 
-    def transform(self):
-        modified_coord_values = [
-            coord + 15
-            if idx % 2
-            else coord
-            for idx, coord in enumerate(helpers.flatten(self.coords))
-        ]
+    def transform(self, transformation: TRANSFORMATION):
+        if transformation == TRANSFORMATION.MOVE_UP:
+            modified_coord_values = [
+                coord + 15
+                if idx % 2
+                else coord
+                for idx, coord in enumerate(helpers.flatten(self.coords))
+            ]
+
+        elif transformation == TRANSFORMATION.MOVE_DOWN:
+            modified_coord_values = [
+                coord - 15
+                if idx % 2
+                else coord
+                for idx, coord in enumerate(helpers.flatten(self.coords))
+            ]
+
+        elif transformation == TRANSFORMATION.MOVE_RIGHT:
+            modified_coord_values = [
+                coord + 15
+                if not idx % 2
+                else coord
+                for idx, coord in enumerate(helpers.flatten(self.coords))
+            ]
+
+        elif transformation == TRANSFORMATION.MOVE_LEFT:
+            modified_coord_values = [
+                coord - 15
+                if not idx % 2
+                else coord
+                for idx, coord in enumerate(helpers.flatten(self.coords))
+            ]
 
         anim = Animation(points=modified_coord_values, duration=0.4, transition='out_back')
         anim += Animation(points=helpers.flatten(self.coords), duration=0.4, transition='in_back')

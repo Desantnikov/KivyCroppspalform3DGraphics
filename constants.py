@@ -1,12 +1,12 @@
 
 """ Main """
-CUBES_ARRAY_WIDTH = 10  # should be dividable by 2
-CUBES_ARRAY_HEIGHT = 10
-CUBES_ARRAY_DEPTH = 10
+CUBES_ARRAY_WIDTH = 6  # should be dividable by 2
+CUBES_ARRAY_HEIGHT = 6
+CUBES_ARRAY_DEPTH = 6
 
 
 """ Geometry """
-CUBE_SIZE = 50
+CUBE_SIZE = 75
 
 # set to no spaces - new cube starts where previous ends
 SPACES_X = CUBE_SIZE * 0.66  # 0.6

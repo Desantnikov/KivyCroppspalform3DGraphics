@@ -9,3 +9,9 @@ class SPATIAL_DIRECTION(IntEnum):
     LEFT = 4
     BACK = 5
 
+
+class TRANSFORMATION(IntEnum):
+    MOVE_UP = 0
+    MOVE_DOWN = 1
+    MOVE_RIGHT = 2
+    MOVE_LEFT = 3
