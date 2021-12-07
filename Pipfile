@@ -8,7 +8,10 @@ cython = "==0.29.19"
 kivy = {extras = ["all"], version = "*"}
 plyer = "*"
 setuptools = "*"
-oscpy = "*"
+"kivy.deps.gstreamer" = "*"
+kivy-examples = "*"
+pillow = "*"
+shapely = "*"
 
 [dev-packages]
 
