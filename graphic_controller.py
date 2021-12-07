@@ -32,13 +32,14 @@ class GraphicController:
             SPATIAL_DIRECTION.FRONT: cube_idx / ((cube_idx + row_idx + cube_idx) / 3),
             SPATIAL_DIRECTION.RIGHT: cube_idx / ((cube_idx + row_idx + row_idx) / 3),
             SPATIAL_DIRECTION.LEFT: cube_idx / ((cube_idx + row_idx + row_idx) / 3),
+            SPATIAL_DIRECTION.BACK: cube_idx / ((cube_idx + row_idx + row_idx) / 3),
         }
 
         side_shadow_multiplier = side_shadow_multiplier_map[side]
 
         recalculated_color = (color_part * side_shadow_multiplier for color_part in initial_color)
 
-        cls.set_color(tuple(recalculated_color))
+        cls.set_color(tuple(recalculated_color) + tuple([100]))
 
     @staticmethod
     def make_gradient_texture(width=500, light_direction='left_to_right', brightness_increase=None, rotate=None, height=None):

@@ -11,10 +11,10 @@ from geometry import helpers
 from geometry.point import Point
 from geometry.enums import SPATIAL_DIRECTION, TRANSFORMATION
 from constants import CUBE_SIDE_INITIAL_COLORS_VALUES, TRANSFORMATION_DISTANCE
-
+from kivy.graphics import Canvas
 
 class CubeSide:
-    __slots__ = ['side_name', 'corners', 'edges', 'drawn_quad', 'drawn_edges']
+    __slots__ = ['side_name', 'corners', 'edges', 'drawn_quad', 'drawn_edges', 'canvas']
 
     INITIAL_COLORS_RGB = CUBE_SIDE_INITIAL_COLORS_VALUES
 
@@ -24,7 +24,7 @@ class CubeSide:
         self.edges = {}
         self.drawn_quad = None
         self.drawn_edges = []
-
+        # self.canvas = Canvas()
         self._update_edges()
 
     def __contains__(self, point):
@@ -39,13 +39,13 @@ class CubeSide:
 
         self.drawn_quad = Quad(points=self.coords_flat)
 
-    def draw_edges(self):
+    def draw_edges(self, dashed=None, dash_offset=None):
         assert not self.drawn_edges, 'Trying to draw already drawn edge'
 
         from operator import attrgetter
 
         for edge in self.edges.values():
-            line = Line(points=list(map(attrgetter('coords_flat'), edge)))
+            line = Line(points=list(map(attrgetter('coords_flat'), edge)), dashes=dashed or [], dash_offset=dash_offset)
             self.drawn_edges.append(line)
 
     def edit_drawing(self, new_points: Tuple[int, ...]):
@@ -104,6 +104,8 @@ class CubeSide:
             ]
 
         elif transformation == TRANSFORMATION.EXPAND_AND_ROTATE:
+            anim_dash = None
+
             if self.side_name == SPATIAL_DIRECTION.FRONT:
                 modified_coord_values = [
                     coord + TRANSFORMATION_DISTANCE
@@ -111,6 +113,7 @@ class CubeSide:
                     else coord - TRANSFORMATION_DISTANCE
                     for idx, coord in enumerate(self.coords_flat, start=1)
                 ]
+
             # another points order for non-front sides
             elif self.side_name == SPATIAL_DIRECTION.RIGHT:
                 print('asd')
@@ -120,6 +123,8 @@ class CubeSide:
                     else coord - TRANSFORMATION_DISTANCE
                     for idx, coord in enumerate(self.coords_flat, start=1)
                 ]
+                anim_dash = Animation(dashes=[20, 20], duration=0.4)
+
             elif self.side_name == SPATIAL_DIRECTION.TOP:
                 modified_coord_values = [
                     coord + TRANSFORMATION_DISTANCE if idx in [2,3,4,6,8]
@@ -135,6 +140,15 @@ class CubeSide:
                     for idx, coord in enumerate(self.coords_flat, start=1)
                 ]
 
+            elif self.side_name == SPATIAL_DIRECTION.BACK:
+                modified_coord_values = [
+                    coord + TRANSFORMATION_DISTANCE if idx in [4, 6, ]
+                    else coord - (TRANSFORMATION_DISTANCE * 3) if idx in [5, 7]
+                    else coord - TRANSFORMATION_DISTANCE
+                    for idx, coord in enumerate(self.coords_flat, start=1)
+                ]
+
+                # anim_dash = Animation(dashes=[20, 20], duration=0.4)
 
         else:
             raise KeyError(f'No such transformation: {transformation}')
@@ -143,23 +157,28 @@ class CubeSide:
         # cube side animation
         anim = Animation(points=modified_coord_values, duration=0.4, transition='out_back')
         anim += Animation(points=self.coords_flat, duration=0.4, transition='in_back')
-
         anim.start(self.drawn_quad)
 
         # cube edges animation
         anim = Animation(points=modified_coord_values[:4], duration=0.4, transition='out_back')
         anim += Animation(points=self.coords_flat[:4], duration=0.4, transition='in_back')
+
         anim.start(self.drawn_edges[0])
 
         anim = Animation(points=modified_coord_values[2:6], duration=0.4, transition='out_back')
         anim += Animation(points=self.coords_flat[2:6], duration=0.4, transition='in_back')
+        if anim_dash is not None:
+            anim += anim_dash
         anim.start(self.drawn_edges[1])
 
         anim = Animation(points=modified_coord_values[4:8], duration=0.4, transition='out_back')
         anim += Animation(points=self.coords_flat[4:8], duration=0.4, transition='in_back')
+
+        if anim_dash is not None:
+            anim += anim_dash
         anim.start(self.drawn_edges[2])
 
         anim = Animation(points=modified_coord_values[6:] + modified_coord_values[:2], duration=0.4, transition='out_back')
         anim += Animation(points=self.coords_flat[6:] + self.coords_flat[:2], duration=0.4, transition='in_back')
-        anim.start(self.drawn_edges[3])
 
+        anim.start(self.drawn_edges[3])

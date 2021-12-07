@@ -15,7 +15,7 @@ from constants import CUBE_SIDE_INITIAL_COLORS_VALUES, CUBE_SIZE, SPACES_X, SPAC
 class Cube:
     __slots__ = ['position_within_parent_cube', 'size', 'sides', 'transformation_in_progress']
     SQUARE_SIDES = set([SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK])
-    SIDES_DRAWING_ORDER = [SPATIAL_DIRECTION.LEFT, SPATIAL_DIRECTION.TOP, SPATIAL_DIRECTION.RIGHT, SPATIAL_DIRECTION.FRONT]
+    SIDES_DRAWING_ORDER = [SPATIAL_DIRECTION.BACK, SPATIAL_DIRECTION.LEFT, SPATIAL_DIRECTION.TOP, SPATIAL_DIRECTION.RIGHT, SPATIAL_DIRECTION.FRONT]
 
     def __init__(self, position_within_parent_cube: Point, size: int = CUBE_SIZE):
         self.position_within_parent_cube = position_within_parent_cube

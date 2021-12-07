@@ -1,6 +1,7 @@
 from geometry.helpers import print_time_elapsed
 from geometry.point import Point
 from geometry.cube import Cube
+from geometry.enums import SPATIAL_DIRECTION
 
 from constants import (
     CUBES_ARRAY_WIDTH,
@@ -36,13 +37,20 @@ class CubeFromCubes:
     @print_time_elapsed
     def draw(self):
         from kivy.graphics import Color
-
         for plot in self.array:  # height (z)
             for row in plot[::-1]:  # rows from back to front
                 for cube in row[::-1]:  # cubes from left to right  #
                     cube.draw_sides()
 
-                    Color(rgb=(0, 0, 0))
+                    Color(rgba=(0, 0, 0, 100))
 
                     for side in cube.drawn_sides:
-                        side.draw_edges()
+                        dashed, dash_offset = None, None
+                        # Color(rgba=(0, 0, 0, 2))
+                        if side.side_name in [SPATIAL_DIRECTION.LEFT, SPATIAL_DIRECTION.BACK]:
+                            Color(rgba=(0, 0, 0, 100))
+                            dashed = [0]
+                            dash_offset = 10
+
+                        side.draw_edges(dashed=dashed, dash_offset=dash_offset)
+

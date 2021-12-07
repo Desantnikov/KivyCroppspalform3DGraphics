@@ -24,7 +24,8 @@ CUBE_SIDE_INITIAL_COLORS_VALUES = {
     'FRONT': (0.4,) * 3,
     'TOP': (0.435,) * 3,
     'RIGHT': (0.47,) * 3,
-    'LEFT': (0.47,) * 3,
+    'LEFT': (0.37,) * 3,
+    'BACK': (0.35,) * 3,
 }
 
 TRANSFORMATION_DISTANCE = 30
