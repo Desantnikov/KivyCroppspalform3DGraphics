@@ -165,8 +165,8 @@ class Cube:
 
         return (
             initial_point,  # bottom left
-            initial_point.apply_delta(0, 0),  # top left
-            initial_point.apply_delta(self.size, 0),  # top right
+            initial_point.apply_delta(0, self.size, ),  # top left
+            initial_point.apply_delta(self.size, self.size, ),  # top right
             initial_point.apply_delta(self.size, 0),  # bottom right
         )
 

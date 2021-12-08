@@ -3,17 +3,17 @@ WINDOW_SIZE = (1640, 970)
 WINDOW_SIZE = [dim * 0.95 for dim in WINDOW_SIZE]
 
 """ Main """
-CUBES_ARRAY_WIDTH = 12  # should be dividable by 2
+CUBES_ARRAY_WIDTH = 16  # should be dividable by 2
 CUBES_ARRAY_HEIGHT = 1
-CUBES_ARRAY_DEPTH = 12
+CUBES_ARRAY_DEPTH = 16
 
 
 """ Geometry """
-CUBE_SIZE = 50
+CUBE_SIZE = 40
 
 # set to no spaces - new cube starts where previous ends
 SPACES_X = CUBE_SIZE * 0.6  # 0.6
-SPACES_Y = CUBE_SIZE * 1.1   # 1.1
+SPACES_Y = CUBE_SIZE * 3   # 1.1
 
 X_OFFSET = ((CUBE_SIZE + SPACES_X) * CUBES_ARRAY_WIDTH) / 1.5
 Y_OFFSET = CUBE_SIZE / 1
@@ -28,5 +28,5 @@ CUBE_SIDE_INITIAL_COLORS_VALUES = {
     'BACK': (0.35,) * 3,
 }
 
-FLAT_SQUARE = True
+FLAT_SQUARE = False
 TRANSFORMATION_DISTANCE = 25
