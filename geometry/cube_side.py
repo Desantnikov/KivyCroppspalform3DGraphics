@@ -170,15 +170,15 @@ class CubeSide:
 
         anim = Animation(points=modified_coord_values[2:6], duration=0.4, transition='out_back')
         anim += Animation(points=self.coords_flat[2:6], duration=0.4, transition='in_back')
-        if anim_dash is not None:
-            anim += anim_dash
+        # if anim_dash is not None:
+        #     anim += anim_dash
         anim.start(self.drawn_edges[1])
 
         anim = Animation(points=modified_coord_values[4:8], duration=0.4, transition='out_back')
         anim += Animation(points=self.coords_flat[4:8], duration=0.4, transition='in_back')
-
-        if anim_dash is not None:
-            anim += anim_dash
+        #
+        # if anim_dash is not None:
+        #     anim += anim_dash
         anim.start(self.drawn_edges[2])
 
         anim = Animation(points=modified_coord_values[6:] + modified_coord_values[:2], duration=0.4, transition='out_back')

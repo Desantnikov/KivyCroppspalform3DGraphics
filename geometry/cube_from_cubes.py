@@ -56,4 +56,3 @@ class CubeFromCubes:
 
                         if not no_draw:
                             side.draw_edges(dashed=dashed, dash_offset=dash_offset)
-                        no_draw = False

@@ -9,7 +9,7 @@ from geometry.cube_side import CubeSide
 from geometry.point import Point
 from geometry.enums import SPATIAL_DIRECTION, TRANSFORMATION
 from geometry import helpers
-from constants import CUBE_SIDE_INITIAL_COLORS_VALUES, CUBE_SIZE, SPACES_X, SPACES_Y, X_OFFSET, Y_OFFSET
+from constants import CUBE_SIDE_INITIAL_COLORS_VALUES, CUBE_SIZE, SPACES_X, SPACES_Y, X_OFFSET, Y_OFFSET, TRANSFORMATION_DISTANCE, FLAT_SQUARE
 
 
 class Cube:
@@ -23,7 +23,7 @@ class Cube:
 
         self.transformation_in_progress = False
         self.sides = {}
-        self._set_sides()
+        self._set_sides(flat_square=FLAT_SQUARE)
 
     def __contains__(self, point):
         return any(point in side for side in self.drawn_sides)
@@ -55,19 +55,62 @@ class Cube:
                 fill_color=(255, 1, 1, 255),
             )
 
-    def change_front_side_points(self, new_points):
-        for side in filter(lambda x: x.drawn_quad, self.sides.values()):
-            side.edit_drawing(new_points=new_points)
+    # def change_front_side_points(self, new_points):
+    #     for side in filter(lambda x: x.drawn_quad, self.sides.values()):
+    #         side.edit_drawing(new_points=new_points)
 
-    def touched(self, touch_button: str, is_double_tap: bool):
-        if touch_button == 'right':
-            self.change_front_side_points(new_points=[0, 0, 0, 0, 0, 0, 0, 0])
-        elif touch_button == 'left':
-            if is_double_tap:
-                self.change_textures()
-                return
+    def touched(self, touch):
+        if touch.button == 'right':
+            for side in filter(lambda x: x.drawn_quad, self.sides.values()):
+                side.edit_drawing(new_points=[0,0,0,0,0,0,0,0])
 
+
+        elif touch.button == 'left' and touch.is_double_tap:
+            # if touch.is_double_tap:
+            self.change_textures()
+                # return
+
+        elif touch.button == 'left':
             self._transform(transformation=TRANSFORMATION.EXPAND_AND_ROTATE)
+
+        elif touch.button == 'middle':
+            self._transform(transformation=TRANSFORMATION.MOVE_UP)
+
+        elif touch.button == 'scrolldown':
+            for side in filter(lambda x: x.drawn_quad, self.sides.values()):
+                initial_points = side.drawn_quad.points
+                if side.side_name in [SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK, SPATIAL_DIRECTION.LEFT]:
+                    to_increment = [3, 5]
+                elif side.side_name in [SPATIAL_DIRECTION.RIGHT]:
+                    to_increment = [1, 7]
+                else:
+                    to_increment = [1, 3, 5, 7]
+
+                updated_points = [
+                    point + TRANSFORMATION_DISTANCE
+                    if idx in to_increment #[3,5, ]
+                    else point
+                    for idx, point in enumerate(initial_points)
+                ]
+                side.edit_drawing(new_points=updated_points)
+
+        elif touch.button == 'scrollup':
+            for side in filter(lambda x: x.drawn_quad, self.sides.values()):
+                initial_points = side.drawn_quad.points
+                if side.side_name in [SPATIAL_DIRECTION.FRONT, SPATIAL_DIRECTION.BACK, SPATIAL_DIRECTION.LEFT]:
+                    to_increment = [3, 5]
+                elif side.side_name in [SPATIAL_DIRECTION.RIGHT]:
+                    to_increment = [1, 7]
+                else:
+                    to_increment = [1, 3, 5, 7]
+
+                updated_points = [
+                    point - TRANSFORMATION_DISTANCE
+                    if idx in to_increment #[3,5, ]
+                    else point
+                    for idx, point in enumerate(initial_points)
+                ]
+                side.edit_drawing(new_points=updated_points)
 
     def _transform(self, transformation: TRANSFORMATION = None):
         if transformation is None:
@@ -76,10 +119,10 @@ class Cube:
         for side in self.drawn_sides:
             side.transform(transformation=transformation)
 
-    def _set_sides(self):
+    def _set_sides(self, flat_square: bool):
         # calc square (front and back) sides first
         for side_name in self.SQUARE_SIDES:
-            corners = self._calc_square_corners(side_name=side_name)
+            corners = self._calc_square_corners(side_name=side_name, flat_square=flat_square)
             self.sides[side_name] = CubeSide(side_name=side_name, corners=corners)
 
         # use already calculated front/back side corners to calc remaining sides
@@ -108,12 +151,22 @@ class Cube:
 
         return side_to_point_map[side_name]
 
-    def _calc_square_corners(self, side_name: SPATIAL_DIRECTION):
+    def _calc_square_corners(self, side_name: SPATIAL_DIRECTION, flat_square=False):
         initial_point = self._calc_initial_point(side_name=side_name)
+
+        if flat_square:
+            # results in a 2-d parralelogram that can be made 3-d by mouse scroll
+            return (
+                initial_point,  # bottom left
+                initial_point.apply_delta(0, 0),  # top left
+                initial_point.apply_delta(self.size, 0),  # top right
+                initial_point.apply_delta(self.size, 0),  # bottom right
+            )
 
         return (
             initial_point,  # bottom left
-            initial_point.apply_delta(0, self.size),  # top left
-            initial_point.apply_delta(self.size, self.size),  # top right
+            initial_point.apply_delta(0, 0),  # top left
+            initial_point.apply_delta(self.size, 0),  # top right
             initial_point.apply_delta(self.size, 0),  # bottom right
         )
+

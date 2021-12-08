@@ -26,6 +26,6 @@ class CubesWidget(Widget):
 
         for collided_cube in filter(lambda cube: touch_point in cube, all_cubes_flat_list):
             with self.canvas:
-                collided_cube.touched(touch_button=touch.button, is_double_tap=touch.is_double_tap)
+                collided_cube.touched(touch=touch)
 
             return
