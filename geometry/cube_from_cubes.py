@@ -47,10 +47,13 @@ class CubeFromCubes:
                     for side in cube.drawn_sides:
                         dashed, dash_offset = None, None
                         # Color(rgba=(0, 0, 0, 2))
+                        no_draw = False
                         if side.side_name in [SPATIAL_DIRECTION.LEFT, SPATIAL_DIRECTION.BACK]:
                             Color(rgba=(0, 0, 0, 100))
-                            dashed = [0]
+                            dashed = []
                             dash_offset = 10
+                            no_draw = True
 
-                        side.draw_edges(dashed=dashed, dash_offset=dash_offset)
-
+                        if not no_draw:
+                            side.draw_edges(dashed=dashed, dash_offset=dash_offset)
+                        no_draw = False

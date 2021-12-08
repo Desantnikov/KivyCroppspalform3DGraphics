@@ -24,7 +24,6 @@ class CubeSide:
         self.edges = {}
         self.drawn_quad = None
         self.drawn_edges = []
-        # self.canvas = Canvas()
         self._update_edges()
 
     def __contains__(self, point):
@@ -35,7 +34,7 @@ class CubeSide:
         return helpers.flatten(corner.coords_flat for corner in self.corners)
 
     def draw_side(self):
-        assert self.drawn_quad is None, 'Trying to draw already drawn figure'
+        # assert self.drawn_quad is None, 'Trying to draw already drawn figure'
 
         self.drawn_quad = Quad(points=self.coords_flat)
 
@@ -45,7 +44,8 @@ class CubeSide:
         from operator import attrgetter
 
         for edge in self.edges.values():
-            line = Line(points=list(map(attrgetter('coords_flat'), edge)), dashes=dashed or [], dash_offset=dash_offset)
+            # invalid arguments (dashed/dash offset) leads to non-drawing of line
+            line = Line(points=list(map(attrgetter('coords_flat'), edge)), dashes=dashed if dashed is not None else [], dash_offset=0)
             self.drawn_edges.append(line)
 
     def edit_drawing(self, new_points: Tuple[int, ...]):
@@ -162,6 +162,9 @@ class CubeSide:
         # cube edges animation
         anim = Animation(points=modified_coord_values[:4], duration=0.4, transition='out_back')
         anim += Animation(points=self.coords_flat[:4], duration=0.4, transition='in_back')
+
+        if not self.drawn_edges:
+            return
 
         anim.start(self.drawn_edges[0])
 

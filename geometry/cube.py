@@ -49,7 +49,7 @@ class Cube:
     def change_front_side_points(self, new_points):
         for side in filter(lambda x: x.drawn_quad, self.sides.values()):
             side.edit_drawing(new_points=new_points)
-            # side.drawn_quad.texture = graphic_controller.GraphicController.make_gradient_texture(height=256)
+            side.drawn_quad.texture = graphic_controller.GraphicController.make_gradient_texture(width=4, height=4, light_direction='fill', fill_color=(244, 1, 1, 1))
 
     def touched(self, touch_button: str):
         if touch_button == 'right':
