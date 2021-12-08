@@ -46,15 +46,27 @@ class Cube:
 
             self.sides[side_name].draw_side()
 
+    def change_textures(self):
+        for side in filter(lambda x: x.drawn_quad, self.sides.values()):
+            side.drawn_quad.texture = graphic_controller.GraphicController.make_gradient_texture(
+                width=4,
+                height=4,
+                light_direction='fill',
+                fill_color=(255, 1, 1, 255),
+            )
+
     def change_front_side_points(self, new_points):
         for side in filter(lambda x: x.drawn_quad, self.sides.values()):
             side.edit_drawing(new_points=new_points)
-            side.drawn_quad.texture = graphic_controller.GraphicController.make_gradient_texture(width=4, height=4, light_direction='fill', fill_color=(244, 1, 1, 1))
 
-    def touched(self, touch_button: str):
+    def touched(self, touch_button: str, is_double_tap: bool):
         if touch_button == 'right':
             self.change_front_side_points(new_points=[0, 0, 0, 0, 0, 0, 0, 0])
         elif touch_button == 'left':
+            if is_double_tap:
+                self.change_textures()
+                return
+
             self._transform(transformation=TRANSFORMATION.EXPAND_AND_ROTATE)
 
     def _transform(self, transformation: TRANSFORMATION = None):
